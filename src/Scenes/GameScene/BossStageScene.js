@@ -46,6 +46,8 @@ class BossStageScene extends Phaser.Scene {
         // Ajouter le titre pour la scène
         this.add.text(width / 2, 20, 'Boss Stage', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5);
 
+
+
         const barHeight = 50;
         const graphics = this.add.graphics();
         graphics.fillStyle(0x000000, 1);
