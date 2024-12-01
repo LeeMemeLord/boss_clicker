@@ -75,6 +75,7 @@ class MainMenu extends Phaser.Scene {
                     else{
                         console.log('Character selected:', item);
                         sessionStorage.setItem('character', JSON.stringify(item));
+                        this.scene.stop('MainMenu')
                         this.scene.start('BossStageScene', { character: item });
                     }
                 });
@@ -142,6 +143,7 @@ class MainMenu extends Phaser.Scene {
 
         hammerImage.on('pointerdown', () => {
             console.log('Create Character button clicked!');
+            this.scene.stop('MainMenu');
             this.scene.start('CharacterMenuScene');
         });
 
@@ -156,6 +158,7 @@ class MainMenu extends Phaser.Scene {
         guillotineImage.on('pointerout', () => {
             guillotineImage.setScale(0.5);
         });
+        // selon la scene implimenter le delete
 
         guillotineImage.on('pointerdown', () => {
             deleteEnabled = true;

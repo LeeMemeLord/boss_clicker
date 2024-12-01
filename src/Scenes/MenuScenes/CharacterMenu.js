@@ -26,12 +26,12 @@ class CharacterMenuScene extends Phaser.Scene {
     preload() {
         for (let skin = 1; skin <= 3; skin++) {
             for (let i = 0; i <= 9; i++) {
-                this.load.image(`knight_${skin}_idle_${i}`, require(`../../assets/sprite/_PNG/${skin}_KNIGHT/Knight_0${skin}__IDLE_00${i}.png`));
+                this.load.image(`Knight_${skin}_idle_${i}`, require(`../../assets/sprite/_PNG/${skin}_KNIGHT/Knight_0${skin}__IDLE_00${i}.png`));
             }
         }
         for (let skin = 1; skin <= 3; skin++) {
             for (let i = 0; i <= 9; i++) {
-                this.load.image(`elf_${skin}_idle_${i}`, require(`../../assets/sprite_elf/_PNG/${skin}/Elf_0${skin}__IDLE_00${i}.png`));
+                this.load.image(`Elf_${skin}_idle_${i}`, require(`../../assets/sprite/_PNG/${skin}_ELF/Elf_0${skin}__IDLE_00${i}.png`));
             }
         }
         // this.load.image('spark', sparkBleu);
@@ -52,9 +52,9 @@ class CharacterMenuScene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         for (let skin = 1; skin <= 3; skin++) {
-            const frames = Array.from({length: 10}, (_, i) => ({key: `knight_${skin}_idle_${i}`}));
+            const frames = Array.from({length: 10}, (_, i) => ({key: `Knight_${skin}_idle_${i}`}));
             this.anims.create({
-                key: `knight_idle_${skin}`,
+                key: `Knight_idle_${skin}`,
                 frames: frames,
                 frameRate: 20,
                 repeat: -1,
@@ -62,9 +62,9 @@ class CharacterMenuScene extends Phaser.Scene {
         }
 
         for (let skin = 1; skin <= 3; skin++) {
-            const frames = Array.from({length: 10}, (_, i) => ({key: `elf_${skin}_idle_${i}`}));
+            const frames = Array.from({length: 10}, (_, i) => ({key: `Elf_${skin}_idle_${i}`}));
             this.anims.create({
-                key: `elf_idle_${skin}`,
+                key: `Elf_idle_${skin}`,
                 frames: frames,
                 frameRate: 20,
                 repeat: -1,
@@ -130,8 +130,8 @@ class CharacterMenuScene extends Phaser.Scene {
                 });
 
             if (character.name === 'Guerrier') {
-                this.knightSprite = this.add.sprite(x, y - 30, `knight_1_idle_0`)
-                    .play(`knight_idle_${this.currentKnightSkin}`)
+                this.knightSprite = this.add.sprite(x, y - 30, `Knight_1_idle_0`)
+                    .play(`Knight_idle_${this.currentKnightSkin}`)
                     .setDisplaySize(cardWidth - 50, cardHeight / 2)
                     .setOrigin(0.5);
 
@@ -155,8 +155,8 @@ class CharacterMenuScene extends Phaser.Scene {
                     .on('pointerdown', () => this.changeKnightSkin(1));
             }
             if (character.name === 'Archer') {
-                this.elfSprite = this.add.sprite(x, y - 30, `elf_1_idle_0`)
-                    .play(`elf_idle_${this.currentElfSkin}`)
+                this.elfSprite = this.add.sprite(x, y - 30, `Elf_1_idle_0`)
+                    .play(`Elf_idle_${this.currentElfSkin}`)
                     .setDisplaySize(cardWidth - 50, cardHeight / 2)
                     .setOrigin(0.5);
 
@@ -233,7 +233,7 @@ class CharacterMenuScene extends Phaser.Scene {
     changeKnightSkin(direction) {
         this.currentKnightSkin = Phaser.Math.Wrap(this.currentKnightSkin + direction, 1, 4);
 
-        this.knightSprite.play(`knight_idle_${this.currentKnightSkin}`);
+        this.knightSprite.play(`Knight_idle_${this.currentKnightSkin}`);
 
         const knightCharacter = this.characters.find((char) => char.name === 'Guerrier');
         this.selectCharacter(knightCharacter, knightCharacter.card);
@@ -242,7 +242,7 @@ class CharacterMenuScene extends Phaser.Scene {
     changeElfSkin(direction) {
         this.currentElfSkin = Phaser.Math.Wrap(this.currentElfSkin + direction, 1, 4);
 
-        this.elfSprite.play(`elf_idle_${this.currentElfSkin}`);
+        this.elfSprite.play(`Elf_idle_${this.currentElfSkin}`);
 
         const elfCharacter = this.characters.find((char) => char.name === 'Archer');
         this.selectCharacter(elfCharacter, elfCharacter.card);
@@ -317,6 +317,7 @@ class CharacterMenuScene extends Phaser.Scene {
                         characterInstance.name = name;
 
                         localStorage.setItem(name, JSON.stringify(characterInstance));
+                        sessionStorage.setItem('character', JSON.stringify(characterInstance));
 
                         console.log('Personnage sauvegardé :', characterInstance);
 
@@ -328,8 +329,9 @@ class CharacterMenuScene extends Phaser.Scene {
                         instructionText.destroy();
                         confirmButton.destroy();
                         errorMessage.destroy();
-
-                        this.scene.start('MainGameScene', { character: characterInstance });
+                        this.scene.stop('CharacterMenuScene');
+                        this.scene.stop('MainMenu');
+                        this.scene.start('BossStageScene', { character: characterInstance });
                     }
                 } else {
                     errorMessage.setText('Veuillez entrer un nom valide.');
