@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import cursor from '../../assets/sprite/Normal.cur';
 import cursor2 from '../../assets/scythe.cur';
-import hammer from '../../assets/hammer.png'; // Assurez-vous que le chemin est correct
+import hammer from '../../assets/hammer.png';
 import sparkBleu from "../../assets/sprite/blue_spark.png";
 import Knight from "../../characters/classes/Knight";
 import Rogue from "../../characters/classes/Rogue";
@@ -16,7 +16,7 @@ class MainMenu extends Phaser.Scene {
         this.load.image('background', require('../../assets/sprite/bg3png.jpg'));
         this.load.image('background2', require('../../assets/graveyard.png'));
         this.load.image('spark', sparkBleu);
-        this.load.image('hammer', hammer); // Charger le marteau
+        this.load.image('hammer', hammer);
         this.input.setDefaultCursor(`url(${cursor}), pointer`);
     }
 
@@ -120,7 +120,6 @@ class MainMenu extends Phaser.Scene {
             }
         });
 
-        // Ajouter l'image du marteau
         const hammerImage = this.add.image(100, screenHeight - 100, 'hammer');
         hammerImage.setInteractive();
         hammerImage.setScale(0.5);
@@ -130,7 +129,6 @@ class MainMenu extends Phaser.Scene {
             fill: '#fff',
         }).setOrigin(0.5);
 
-        // Interaction avec le marteau
         hammerImage.on('pointerover', () => {
             hammerImage.setScale(0.6);
         });
@@ -156,7 +154,6 @@ class MainMenu extends Phaser.Scene {
         guillotineImage.on('pointerout', () => {
             guillotineImage.setScale(0.5);
         });
-        // selon la scene implimenter le delete
 
         guillotineImage.on('pointerdown', () => {
             deleteEnabled = true;
@@ -164,10 +161,8 @@ class MainMenu extends Phaser.Scene {
             background.setTexture('background2');
             this.input.setDefaultCursor(`url(${cursor2}), pointer`);
 
-            // Mettre à jour le message général
             generalMessage.setText('HOLD TO DELETE');
 
-            // Ajouter le bouton "Cancel"
             cancelButton.setVisible(true);
         });
 
@@ -184,9 +179,8 @@ class MainMenu extends Phaser.Scene {
         })
             .setOrigin(0.5)
             .setInteractive()
-            .setVisible(false); // Cacher le bouton au début
+            .setVisible(false);
 
-        // Interaction avec le bouton "Cancel"
         cancelButton.on('pointerover', () => {
             cancelButton.setStyle({fill: '#FFD700'});
             cancelButton.setScale(1.1);
@@ -209,9 +203,7 @@ class MainMenu extends Phaser.Scene {
     lancerLeJeu(item) {
         console.log('Character selected:', item);
         sessionStorage.setItem('character', JSON.stringify(item));
-        this.scene.stop('MainMenu');
 
-        // Determine the class type based on the skin property
         let character;
         if (item.skin.includes("Knight")) {
             character = new Knight();
@@ -219,15 +211,16 @@ class MainMenu extends Phaser.Scene {
             character = new Rogue();
         } else {
             console.error("Unknown character type!");
-            return; // Exit the function if no valid type is found
+            return;
         }
 
         console.log(`Character class: ${character.constructor.name}`);
 
-        // Copy properties from `item` to the new instance
         Object.assign(character, item);
 
-        // Start the game scene with the new character
+        this.scene.stop('MainMenu');
+        this.scene.stop('CharacterMenuScene');
+
         this.scene.start('BossStageScene', { character });
     }
 

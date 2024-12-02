@@ -11,8 +11,9 @@ class BossStageScene extends Phaser.Scene {
     }
 
     init(data) {
+        this.scene.stop('CharacterMenuScene');
+        this.scene.stop('MainMenu');
         if (data.character) {
-            // Si le personnage n'est pas une instance valide, réinstancier la classe correcte
             if (data.character.skin.includes('Knight')) {
                 this.character = new Knight(
                     data.character.name,
@@ -31,7 +32,6 @@ class BossStageScene extends Phaser.Scene {
                 return;
             }
 
-            // Copier les propriétés du personnage passé dans la nouvelle instance
             Object.assign(this.character, data.character);
         } else {
             console.error('No character data provided.');
@@ -40,18 +40,16 @@ class BossStageScene extends Phaser.Scene {
 
         console.log('Character initialized:', this.character);
 
-        // Extraire le numéro et le skin si la classe est bien définie
         if (this.character && this.character.skin) {
-            this.number = this.character.skin.match(/\d+/)[0]; // Extraire le premier nombre
-            this.skin = this.character.skin.replace(`_${this.number}`, ''); // Enlever le numéro pour obtenir le skin
+            this.number = this.character.skin.match(/\d+/)[0];
+            this.skin = this.character.skin.replace(`_${this.number}`, '');
         }
     }
 
     preload() {
         this.load.image('background3', require('../../assets/forest.png'));
-        this.load.image('particle', elec2); // Assurez-vous de charger une particule
+        this.load.image('particle', elec2);
 
-        // Charger les frames d'animation du personnage
         if (this.character) {
             for (let i = 0; i <= 9; i++) {
                 this.load.image(
@@ -90,7 +88,7 @@ class BossStageScene extends Phaser.Scene {
         });
 
         const totalNumbers = 10;
-        const yPosition8 = (height / totalNumbers) * 8; // Position verticale du numéro 8
+        const yPosition8 = (height / totalNumbers) * 8;
 
         const particles = this.add.particles('particle');
         const lineEmitter = particles.createEmitter({
@@ -110,7 +108,6 @@ class BossStageScene extends Phaser.Scene {
                 key: `${this.skin}_idle_${i}`,
             }));
 
-            // Créer l'animation idle
             this.anims.create({
                 key: `${this.skin}_idle`,
                 frames: idleFrames,
@@ -118,20 +115,17 @@ class BossStageScene extends Phaser.Scene {
                 repeat: -1,
             });
 
-            // Créer les frames pour l'animation d'attaque
             const attackFrames = Array.from({ length: 10 }, (_, i) => ({
                 key: `${this.skin}_attack_${i}`,
             }));
 
-            // Créer l'animation d'attaque
             this.anims.create({
                 key: `${this.skin}_attack`,
                 frames: attackFrames,
                 frameRate: 20,
-                repeat: 0, // Jouer une seule fois
+                repeat: 0,
             });
 
-            // Ajouter le sprite du personnage
             const characterSprite = this.add.sprite(width / 2, yPosition8 - 75, `${this.skin}_idle_0`)
                 .play(`${this.skin}_idle`)
                 .setDisplaySize(400, 500)
@@ -139,12 +133,10 @@ class BossStageScene extends Phaser.Scene {
 
             const maxHealth = this.character.stats.hp;
 
-
-            // Barre de vie
             const healthBarWidth = 200;
             const healthBarHeight = 20;
             const healthBarX = characterSprite.x - healthBarWidth / 2;
-            const healthBarY = characterSprite.y - 280;
+            const healthBarY = characterSprite.y - 200;
             const healthBarBackground = this.add.graphics();
             healthBarBackground.fillStyle(0xff0000, 1);
             healthBarBackground.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
@@ -162,36 +154,31 @@ class BossStageScene extends Phaser.Scene {
 
             const showDamageText = (x, y, damage) => {
                 const damageText = this.add.text(x, y, `-${damage}`, {
-                    fontSize: '24px',
+                    fontSize: '42px',
                     fill: '#ff0000',
                     stroke: '#000000',
                     strokeThickness: 2,
                 }).setOrigin(0.5);
 
-                // Animation de montée et de disparition
                 this.tweens.add({
                     targets: damageText,
                     y: y - 50,
                     alpha: 0,
                     duration: 1000,
                     ease: 'Power1',
-                    onComplete: () => damageText.destroy(), // Supprime le texte après l'animation
+                    onComplete: () => damageText.destroy(),
                 });
             };
 
-            // Ajouter un événement pour l'attaque sur clic de la souris
             this.input.on('pointerdown', (pointer) => {
-                // Jouer l'animation d'attaque
                 characterSprite.play(`${this.skin}_attack`);
 
-                // Revenir à l'animation idle après la fin de l'attaque
                 characterSprite.on('animationcomplete', (animation) => {
                     if (animation.key === `${this.skin}_attack`) {
                         characterSprite.play(`${this.skin}_idle`);
                     }
                 });
 
-                // Activer les particules pour représenter l'attaque
                 const emitter = particles.createEmitter({
                     x: pointer.x,
                     y: pointer.y,
@@ -203,7 +190,6 @@ class BossStageScene extends Phaser.Scene {
                     blendMode: 'ADD',
                 });
 
-                // Activer les particules en "ligne"
                 lineEmitter.setPosition(characterSprite.x, characterSprite.y);
                 lineEmitter.setEmitZone({
                     type: 'edge',
@@ -212,25 +198,18 @@ class BossStageScene extends Phaser.Scene {
                 });
                 lineEmitter.start();
 
-                // Arrêter les émetteurs après un délai
                 this.time.delayedCall(500, () => {
                     emitter.stop();
                     lineEmitter.stop();
                 });
-                this.character.attackEnemy(this.character);
-
-                // const damage = this.character.stats.atk * 2;
+                let damage = this.character.attackEnemy(this.character);
 
                 updateHealthBar();
 
-                // Afficher les dégâts infligés au-dessus du personnage
-                // Les dégâts sont calculés par `attackEnemy`
-                // showDamageText(characterSprite.x, characterSprite.y - 100, damage);
+                showDamageText(characterSprite.x, characterSprite.y - 100, damage);
 
-                // Vérifier si le personnage est toujours en vie
                 if (!this.character.isAlive()) {
                     console.log(`${this.character.name} est KO !`);
-                    // Vous pouvez ajouter une logique supplémentaire ici (ex. redémarrer la scène, afficher un écran de défaite, etc.)
                 }
             });
 

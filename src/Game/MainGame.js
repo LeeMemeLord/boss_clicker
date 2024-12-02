@@ -12,15 +12,14 @@ const MainGame = () => {
         if (Object.keys(sessionStorage).length > 0) {
             const firstKey = Object.keys(sessionStorage)[0];
             characterData = JSON.parse(sessionStorage.getItem(firstKey));
-            initialScene = 'BossStageScene'; // Si sessionStorage contient des données
+            initialScene = 'BossStageScene';
         } else if (Object.keys(localStorage).length === 0) {
-            initialScene = 'CharacterMenuScene'; // Si localStorage est vide
+            initialScene = 'CharacterMenuScene';
         }
 
         console.log(`Scène initiale : ${initialScene}`);
         console.log('Données du personnage :', characterData);
 
-        // Configuration de Phaser
         const config = {
             type: Phaser.WEBGL,
             width: window.innerWidth,
@@ -38,21 +37,21 @@ const MainGame = () => {
 
         const game = new Phaser.Game(config);
 
-        // Démarrer la scène initiale
+
         if (characterData) {
+            game.scene.stop('MainMenu');
+            game.scene.stop('CharacterMenuScene');
             game.scene.start('BossStageScene', { character: characterData });
         } else {
             game.scene.start(initialScene);
         }
 
-        // Gérer la redimension de la fenêtre
         const handleResize = () => {
             game.scale.resize(window.innerWidth, window.innerHeight);
         };
 
         window.addEventListener('resize', handleResize);
-
-        // Nettoyage lors de la destruction du composant
+        
         return () => {
             window.removeEventListener('resize', handleResize);
             game.destroy(true);
