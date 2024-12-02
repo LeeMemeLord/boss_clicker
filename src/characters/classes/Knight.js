@@ -12,13 +12,14 @@ class Knight extends Character {
         });
     }
 
+    // Compétence spéciale : Bouclier Protecteur
     shieldBlock() {
         console.log(`${this.name} utilise Bouclier Protecteur ! Augmente la défense temporairement.`);
-        this.stats.def += 10;
+        this.stats.def += 10; // Augmente temporairement la défense
         setTimeout(() => {
-            this.stats.def -= 10;
+            this.stats.def -= 10; // Restaure la défense initiale
             console.log(`${this.name} a perdu l'effet Bouclier Protecteur.`);
-        }, 5000);
+        }, 5000); // L'effet dure 5 secondes
     }
 }
 

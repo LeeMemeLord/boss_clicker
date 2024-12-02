@@ -4,9 +4,7 @@ class Character {
         this.description = description;
         this.level = 1;
         this.exp = 0;
-        this.skin = "";
-
-        // Statistiques de base
+        this.skin = baseStats.skin || ""; // Utilise le skin si fourni
         this.stats = {
             hp: baseStats.hp,
             atk: baseStats.atk,
@@ -14,20 +12,20 @@ class Character {
             crit: baseStats.crit, // En pourcentage (0.1 = 10%)
             lifeSteal: baseStats.lifeSteal, // En pourcentage (0.05 = 5%)
         };
-
-        // HP actuel
-        this.currentHp = this.stats.hp;
+        this.currentHp = this.stats.hp; // Initialise les HP actuels à leur maximum
     }
 
     // Méthode pour infliger des dégâts à un ennemi
     attackEnemy(enemy) {
+        console.log(` attaque ${enemy}!`);
+        console.log(`${this.name} attaque ${enemy.name}!`);
         const isCrit = Math.random() < this.stats.crit; // Détermine si c'est un coup critique
         const damage = isCrit
             ? this.stats.atk * 2 // Dégâts critiques (double attaque)
             : this.stats.atk;
 
         const finalDamage = Math.max(damage - enemy.stats.def, 0);
-        enemy.currentHp -= finalDamage;
+        enemy.currentHp = Math.max(enemy.currentHp - finalDamage, 0); // Réduit les HP de l'ennemi sans descendre sous 0
 
         // Vol de vie
         const lifeStealAmount = finalDamage * this.stats.lifeSteal;
@@ -39,6 +37,8 @@ class Character {
             }. Vol de vie : ${lifeStealAmount.toFixed(2)}.`
         );
     }
+
+
 
     gainExp(amount) {
         this.exp += amount;
@@ -60,8 +60,8 @@ class Character {
         this.stats.hp += 10;
         this.stats.atk += 2;
         this.stats.def += 2;
-        this.stats.crit += 0.01; // Augmente le crit de 1%
-        this.stats.lifeSteal += 0.01; // Augmente le vol de vie de 1%
+        this.stats.crit = Math.min(this.stats.crit + 0.01, 1); // Limite à 100% de critique
+        this.stats.lifeSteal = Math.min(this.stats.lifeSteal + 0.01, 1); // Limite à 100% de vol de vie
         this.currentHp = this.stats.hp; // Restaure la vie
     }
 

@@ -3,10 +3,12 @@ import cursor from '../../assets/sprite/Normal.cur';
 import cursor2 from '../../assets/scythe.cur';
 import hammer from '../../assets/hammer.png'; // Assurez-vous que le chemin est correct
 import sparkBleu from "../../assets/sprite/blue_spark.png";
+import Knight from "../../characters/classes/Knight";
+import Rogue from "../../characters/classes/Rogue";
 
 class MainMenu extends Phaser.Scene {
     constructor() {
-        super({ key: 'MainMenu' });
+        super({key: 'MainMenu'});
     }
 
     preload() {
@@ -19,7 +21,7 @@ class MainMenu extends Phaser.Scene {
     }
 
     create() {
-        const { width, height } = this.sys.game.config;
+        const {width, height} = this.sys.game.config;
 
         const background = this.add.image(width / 2, height / 2, 'background').setDisplaySize(width, height);
 
@@ -63,7 +65,7 @@ class MainMenu extends Phaser.Scene {
                     fill: '#fff',
                 }).setOrigin(0.5);
 
-                boxes.push({ key, box, text, redness: 0 });
+                boxes.push({key, box, text, redness: 0});
 
                 box.setInteractive();
 
@@ -71,12 +73,8 @@ class MainMenu extends Phaser.Scene {
                 box.on('pointerdown', () => {
                     if (deleteEnabled) {
                         holdStart = this.time.now;
-                    }
-                    else{
-                        console.log('Character selected:', item);
-                        sessionStorage.setItem('character', JSON.stringify(item));
-                        this.scene.stop('MainMenu')
-                        this.scene.start('BossStageScene', { character: item });
+                    } else {
+                        this.lancerLeJeu(item);
                     }
                 });
 
@@ -182,7 +180,7 @@ class MainMenu extends Phaser.Scene {
             fontSize: '20px',
             fill: '#fff',
             backgroundColor: '#FF0000',
-            padding: { x: 10, y: 5 },
+            padding: {x: 10, y: 5},
         })
             .setOrigin(0.5)
             .setInteractive()
@@ -190,12 +188,12 @@ class MainMenu extends Phaser.Scene {
 
         // Interaction avec le bouton "Cancel"
         cancelButton.on('pointerover', () => {
-            cancelButton.setStyle({ fill: '#FFD700' });
+            cancelButton.setStyle({fill: '#FFD700'});
             cancelButton.setScale(1.1);
         });
 
         cancelButton.on('pointerout', () => {
-            cancelButton.setStyle({ fill: '#fff' });
+            cancelButton.setStyle({fill: '#fff'});
             cancelButton.setScale(1);
         });
 
@@ -207,6 +205,32 @@ class MainMenu extends Phaser.Scene {
             cancelButton.setVisible(false);
         });
     }
+
+    lancerLeJeu(item) {
+        console.log('Character selected:', item);
+        sessionStorage.setItem('character', JSON.stringify(item));
+        this.scene.stop('MainMenu');
+
+        // Determine the class type based on the skin property
+        let character;
+        if (item.skin.includes("Knight")) {
+            character = new Knight();
+        } else if (item.skin.includes("Rogue")) {
+            character = new Rogue();
+        } else {
+            console.error("Unknown character type!");
+            return; // Exit the function if no valid type is found
+        }
+
+        console.log(`Character class: ${character.constructor.name}`);
+
+        // Copy properties from `item` to the new instance
+        Object.assign(character, item);
+
+        // Start the game scene with the new character
+        this.scene.start('BossStageScene', { character });
+    }
+
 
     animateTextSize(text) {
         this.tweens.add({
@@ -224,12 +248,12 @@ class MainMenu extends Phaser.Scene {
         const particles = this.add.particles('spark');
         const emitter = particles.createEmitter({
             lifespan: 1000,
-            speed: { min: 50, max: 150 },
-            angle: { min: 0, max: 360 },
+            speed: {min: 50, max: 150},
+            angle: {min: 0, max: 360},
             quantity: 2,
             radial: true,
-            scale: { start: 0.009, end: 0 },
-            alpha: { start: 1, end: 0 },
+            scale: {start: 0.009, end: 0},
+            alpha: {start: 1, end: 0},
             blendMode: Phaser.BlendModes.ADD,
         });
 
