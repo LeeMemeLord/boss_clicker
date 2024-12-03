@@ -16,8 +16,6 @@ class Character {
     }
 
     attackEnemy(enemy) {
-        console.log(` attaque ${enemy}!`);
-        console.log(`${this.name} attaque ${enemy.name}!`);
         const isCrit = Math.random() < this.stats.crit;
         const damage = isCrit
             ? this.stats.atk * 2
@@ -26,8 +24,14 @@ class Character {
         const finalDamage = Math.max(damage - enemy.stats.def, 0);
         enemy.currentHp = Math.max(enemy.currentHp - finalDamage, 0);
 
-        // Vol de vie
-        const lifeStealAmount = finalDamage * this.stats.lifeSteal;
+        console.log(`${enemy.name} HP restant: ${enemy.currentHp}`);
+
+        if (enemy.currentHp === 0) {
+            console.log(`${enemy.name} est vaincu !`);
+        }
+        // Vol de vie aleatoire du pourcentage de vieSteal
+        const isLifeSteal = Math.random() < this.stats.lifeSteal;
+        const lifeStealAmount = isLifeSteal ? finalDamage * this.stats.lifeSteal : 0;
         this.currentHp = Math.min(this.currentHp + lifeStealAmount, this.stats.hp);
 
         console.log(
@@ -35,8 +39,10 @@ class Character {
                 isCrit ? '(CRITIQUE)' : ''
             }. Vol de vie : ${lifeStealAmount.toFixed(2)}.`
         );
+
         return finalDamage;
     }
+
 
     gainExp(amount) {
         this.exp += amount;

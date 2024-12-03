@@ -7,40 +7,26 @@ import Character from "../../characters/Character";
 
 class BossStageScene extends Phaser.Scene {
     constructor() {
-        super({ key: 'BossStageScene' });
+        super({key: 'BossStageScene'});
     }
 
     init(data) {
+
         this.scene.stop('CharacterMenuScene');
         this.scene.stop('MainMenu');
+
+        this.character = null;
+        this.skin = null;
+        this.number = null;
+
         if (data.character) {
             if (data.character.skin.includes('Knight')) {
-                this.character = new Knight(
-                    data.character.name,
-                    data.character.description,
-                    data.character.stats
-                );
-                console.log('Character data provided111111:', this.character);
-            } else if (data.character.skin.includes('Rogue')) {
-                this.character = new Rogue(
-                    data.character.name,
-                    data.character.description,
-                    data.character.stats
-                );
-            } else {
-                console.error('Unknown character type, cannot instantiate.');
-                return;
+                this.character = new Knight(data.character.name, data.character.description, data.character.stats);
+            } else if (data.character.skin.includes('Elf')) {
+                this.character = new Rogue(data.character.name, data.character.description, data.character.stats);
             }
-
             Object.assign(this.character, data.character);
-        } else {
-            console.error('No character data provided.');
-            this.character = null;
-        }
 
-        console.log('Character initialized:', this.character);
-
-        if (this.character && this.character.skin) {
             this.number = this.character.skin.match(/\d+/)[0];
             this.skin = this.character.skin.replace(`_${this.number}`, '');
         }
@@ -49,30 +35,77 @@ class BossStageScene extends Phaser.Scene {
     preload() {
         this.load.image('background3', require('../../assets/forest.png'));
         this.load.image('particle', elec2);
-
+        console.log(this.skin);
+        console.log(this.number);
         if (this.character) {
             for (let i = 0; i <= 9; i++) {
                 this.load.image(
-                    `${this.skin}_idle_${i}`,
+                    `${this.skin}${this.number}_idle_${i}`,
                     require(`../../assets/sprite/_PNG/${this.number}_${this.skin.toUpperCase()}/${this.skin}_0${this.number}__IDLE_00${i}.png`)
                 );
 
                 this.load.image(
-                    `${this.skin}_attack_${i}`,
+                    `${this.skin}${this.number}_attack_${i}`,
                     require(`../../assets/sprite/_PNG/${this.number}_${this.skin.toUpperCase()}/${this.skin}_0${this.number}__ATTACK_00${i}.png`)
+                );
+
+                this.load.image(
+                    `${this.skin}${this.number}_hurt_${i}`,
+                    require(`../../assets/sprite/_PNG/${this.number}_${this.skin.toUpperCase()}/${this.skin}_0${this.number}__HURT_00${i}.png`)
+                );
+
+                this.load.image(
+                    `${this.skin}${this.number}_dead_${i}`,
+                    require(`../../assets/sprite/_PNG/${this.number}_${this.skin.toUpperCase()}/${this.skin}_0${this.number}__DIE_00${i}.png`)
                 );
             }
         }
     }
 
     create() {
-        const { width, height } = this.sys.game.config;
+        const {width, height} = this.sys.game.config;
+
+        this.time.delayedCall(10000, () => {
+
+            this.cameras.main.shake(500, 0.02);
+
+            this.time.delayedCall(500, () => {
+                this.add.text(width / 2, height / 2, 'Attention!', {
+                    fontSize: '48px',
+                    fill: '#ff0000',
+                    stroke: '#000',
+                    strokeThickness: 4,
+                }).setOrigin(0.5);
+            });
+        });
+
+        let counter = 0;
 
         this.add.image(width / 2, height / 2, 'background3').setDisplaySize(width, height);
 
-        this.add.text(width / 2, 20, 'Boss Stage', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5);
+        this.add.text(width / 2, 20, 'Boss Stage', {fontSize: '32px', fill: '#fff'}).setOrigin(0.5);
 
+        const backButton = this.add.text(10, 10, 'Retour', {
+            fontSize: '24px',
+            fill: '#fff',
+            backgroundColor: '#000',
+            padding: {x: 10, y: 5},
+            borderRadius: 5,
+        })
+            .setInteractive({useHandCursor: true})
+            .on('pointerdown', () => {
+                sessionStorage.clear();
+                this.scene.stop('BossStageScene');
+                this.scene.start('MainMenu');
+            })
+            .on('pointerover', () => {
+                backButton.setStyle({fill: '#ff0'});
+            })
+            .on('pointerout', () => {
+                backButton.setStyle({fill: '#fff'});
+            });
 
+        backButton.setOrigin(0, 0);
 
         const barHeight = 50;
         const graphics = this.add.graphics();
@@ -95,48 +128,85 @@ class BossStageScene extends Phaser.Scene {
             x: 0,
             y: 0,
             speed: 200,
-            scale: { start: 0.06, end: 0 },
+            scale: {start: 0.06, end: 0},
             lifespan: 500,
-            rotate: { start: 0, end: 360 },
+            rotate: {start: 0, end: 360},
             blendMode: 'ADD',
             active: false,
 
         });
 
         if (this.character) {
-            const idleFrames = Array.from({ length: 10 }, (_, i) => ({
-                key: `${this.skin}_idle_${i}`,
+            const idleFrames = Array.from({length: 10}, (_, i) => ({
+                key: `${this.skin}${this.number}_idle_${i}`,
             }));
 
             this.anims.create({
-                key: `${this.skin}_idle`,
+                key: `${this.skin}${this.number}_idle`,
                 frames: idleFrames,
                 frameRate: 20,
                 repeat: -1,
             });
 
-            const attackFrames = Array.from({ length: 10 }, (_, i) => ({
-                key: `${this.skin}_attack_${i}`,
+            const attackFrames = Array.from({length: 10}, (_, i) => ({
+                key: `${this.skin}${this.number}_attack_${i}`,
             }));
 
             this.anims.create({
-                key: `${this.skin}_attack`,
+                key: `${this.skin}${this.number}_attack`,
                 frames: attackFrames,
                 frameRate: 20,
                 repeat: 0,
             });
 
-            const characterSprite = this.add.sprite(width / 2, yPosition8 - 75, `${this.skin}_idle_0`)
-                .play(`${this.skin}_idle`)
-                .setDisplaySize(400, 500)
-                .setOrigin(0.5);
+            const hurtFrames = Array.from({length: 10}, (_, i) => ({
+                key: `${this.skin}${this.number}_hurt_${i}`,
+            }));
+
+            this.anims.create({
+                key: `${this.skin}${this.number}_hurt`,
+                frames: hurtFrames,
+                frameRate: 20,
+                repeat: 0,
+            });
+
+            const deadFrames = Array.from({length: 10}, (_, i) => ({
+                key: `${this.skin}${this.number}_dead_${i}`,
+            }));
+
+            this.anims.create({
+                key: `${this.skin}${this.number}_dead`,
+                frames: deadFrames,
+                frameRate: 20,
+                repeat: 0,
+            });
+
+            if (this.characterSprite) {
+                this.characterSprite.destroy(); // Supprime l'ancien sprite s'il existe
+            }
+
+            if (this.character.skin.includes('Knight')) {
+                this.characterSprite = this.add.sprite(200, yPosition8 - 75, `${this.skin}${this.number}_idle_0`)
+                    .play(`${this.skin}${this.number}_idle`)
+                    .setDisplaySize(400, 500)
+                    .setOrigin(0.5);
+            }
+            else if (this.character.skin.includes('Elf')) {
+                this.characterSprite = this.add.sprite(200, yPosition8 - 145, `${this.skin}${this.number}_idle_0`)
+                    .play(`${this.skin}${this.number}_idle`)
+                    .setDisplaySize(400, 500)
+                    .setOrigin(0.5);
+            }
+
+
+
 
             const maxHealth = this.character.stats.hp;
 
             const healthBarWidth = 200;
             const healthBarHeight = 20;
-            const healthBarX = characterSprite.x - healthBarWidth / 2;
-            const healthBarY = characterSprite.y - 200;
+            const healthBarX = this.characterSprite.x - healthBarWidth / 2;
+            const healthBarY = this.characterSprite.y - 200;
             const healthBarBackground = this.add.graphics();
             healthBarBackground.fillStyle(0xff0000, 1);
             healthBarBackground.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
@@ -170,51 +240,128 @@ class BossStageScene extends Phaser.Scene {
                 });
             };
 
-            this.input.on('pointerdown', (pointer) => {
-                characterSprite.play(`${this.skin}_attack`);
+            if (!this.character.currentHp <= 0 || counter === 0) {
+                this.input.on('pointerdown', (pointer) => {
 
-                characterSprite.on('animationcomplete', (animation) => {
-                    if (animation.key === `${this.skin}_attack`) {
-                        characterSprite.play(`${this.skin}_idle`);
+                    console.log(counter)
+                    if (counter === 0) {
+                        this.characterSprite.play(`${this.skin}${this.number}_attack`);
+                        this.characterSprite.on('animationcomplete', (animation) => {
+                            if (animation.key === `${this.skin}${this.number}_attack`) {
+                                this.characterSprite.play(`${this.skin}${this.number}_idle`);
+                            }
+                        });
                     }
+
+                    const emitter = particles.createEmitter({
+                        x: pointer.x,
+                        y: pointer.y,
+                        speed: {min: 100, max: 200},
+                        angle: {min: 0, max: 360},
+                        scale: {start: 0.1, end: 0},
+                        lifespan: 300,
+                        rotate: {start: 0, end: 360},
+                        blendMode: 'ADD',
+                    });
+
+                    lineEmitter.setPosition(this.characterSprite.x, this.characterSprite.y);
+                    lineEmitter.setEmitZone({
+                        type: 'edge',
+                        source: new Phaser.Geom.Line(this.characterSprite.x, this.characterSprite.y, pointer.x, pointer.y),
+                        quantity: 50,
+                    });
+                    lineEmitter.start();
+
+                    this.time.delayedCall(500, () => {
+                        emitter.stop();
+                        lineEmitter.stop();
+                    });
+                    if (!this.character.currentHp <= 0) {
+                        let damage = this.character.attackEnemy(this.character);
+
+                        updateHealthBar();
+
+                        showDamageText(this.characterSprite.x, this.characterSprite.y - 100, damage);
+                    }
+
+                    if (this.character.currentHp <= 0 && counter === 0) {
+                        console.log(`${this.character.name} est KO !`);
+                        counter++;
+                        this.characterSprite.play(`${this.skin}${this.number}_dead`).once('animationcomplete', () => {
+                            particles.setVisible(false);
+                            lineEmitter.stop();
+
+                            const gameOverText = this.add.text(
+                                this.cameras.main.centerX,
+                                this.cameras.main.centerY - 100,
+                                'Game Over',
+                                {
+                                    fontSize: '64px',
+                                    fill: '#ff0000',
+                                    stroke: '#000000',
+                                    strokeThickness: 4,
+                                }
+                            ).setOrigin(0.5);
+
+                            // Bouton Retry
+                            const retryButton = this.add.text(
+                                this.cameras.main.centerX,
+                                this.cameras.main.centerY,
+                                'Retry',
+                                {
+                                    fontSize: '32px',
+                                    fill: '#fff',
+                                    backgroundColor: '#000',
+                                    padding: {x: 20, y: 10},
+                                    borderRadius: 5,
+                                }
+                            )
+                                .setOrigin(0.5)
+                                .setInteractive({useHandCursor: true})
+                                .on('pointerdown', () => {
+                                    this.scene.restart();
+                                })
+                                .on('pointerover', () => {
+                                    retryButton.setStyle({fill: '#ff0'});
+                                })
+                                .on('pointerout', () => {
+                                    retryButton.setStyle({fill: '#fff'});
+                                });
+
+                            // Bouton Retour
+                            const backButton = this.add.text(
+                                this.cameras.main.centerX,
+                                this.cameras.main.centerY + 60,
+                                'Retour',
+                                {
+                                    fontSize: '32px',
+                                    fill: '#fff',
+                                    backgroundColor: '#000',
+                                    padding: {x: 20, y: 10},
+                                    borderRadius: 5,
+                                }
+                            )
+                                .setOrigin(0.5)
+                                .setInteractive({useHandCursor: true})
+                                .on('pointerdown', () => {
+                                    sessionStorage.clear();
+                                    this.scene.stop('BossStageScene');
+                                    this.scene.start('MainMenu');
+                                })
+                                .on('pointerover', () => {
+                                    backButton.setStyle({fill: '#ff0'});
+                                })
+                                .on('pointerout', () => {
+                                    backButton.setStyle({fill: '#fff'});
+                                });
+
+                        });
+
+                    }
+
                 });
-
-                const emitter = particles.createEmitter({
-                    x: pointer.x,
-                    y: pointer.y,
-                    speed: { min: 100, max: 200 },
-                    angle: { min: 0, max: 360 },
-                    scale: { start: 0.1, end: 0 },
-                    lifespan: 300,
-                    rotate: { start: 0, end: 360 },
-                    blendMode: 'ADD',
-                });
-
-                lineEmitter.setPosition(characterSprite.x, characterSprite.y);
-                lineEmitter.setEmitZone({
-                    type: 'edge',
-                    source: new Phaser.Geom.Line(characterSprite.x, characterSprite.y, pointer.x, pointer.y),
-                    quantity: 50,
-                });
-                lineEmitter.start();
-
-                this.time.delayedCall(500, () => {
-                    emitter.stop();
-                    lineEmitter.stop();
-                });
-                let damage = this.character.attackEnemy(this.character);
-
-                updateHealthBar();
-
-                showDamageText(characterSprite.x, characterSprite.y - 100, damage);
-
-                if (!this.character.isAlive()) {
-                    console.log(`${this.character.name} est KO !`);
-                }
-            });
-
+            }
         }
-
 
         const baseY = height - 50 / 2;
         const text = 'Réalisé par LeeMemeLord';
@@ -248,6 +395,17 @@ class BossStageScene extends Phaser.Scene {
             },
         });
     }
+
+    clearAnimations() {
+        const animations = this.anims.anims.entries;
+        Object.keys(animations).forEach((key) => {
+            if (key.includes(this.skin)) {
+                this.anims.remove(key);
+            }
+        });
+        this.children.removeAll();
+    }
+
 }
 
 export default BossStageScene;

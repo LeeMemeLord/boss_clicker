@@ -15,7 +15,7 @@ class CharacterMenuScene extends Phaser.Scene {
     init() {
         this.characters = [
             {id: 1, name: 'Guerrier', description: 'Un combattant robuste avec une épée.'},
-            {id: 2, name: 'Archer', description: 'Un tireur agile avec une grande portée.'},
+            {id: 2, name: 'Elf', description: 'Un tireur agile avec une grande portée.'},
         ];
 
         this.currentKnightSkin = 1;
@@ -154,7 +154,7 @@ class CharacterMenuScene extends Phaser.Scene {
                     .setInteractive()
                     .on('pointerdown', () => this.changeKnightSkin(1));
             }
-            if (character.name === 'Archer') {
+            if (character.name === 'Elf') {
                 this.elfSprite = this.add.sprite(x, y - 30, `Elf_1_idle_0`)
                     .play(`Elf_idle_${this.currentElfSkin}`)
                     .setDisplaySize(cardWidth - 50, cardHeight / 2)
@@ -236,6 +236,7 @@ class CharacterMenuScene extends Phaser.Scene {
         this.knightSprite.play(`Knight_idle_${this.currentKnightSkin}`);
 
         const knightCharacter = this.characters.find((char) => char.name === 'Guerrier');
+        knightCharacter.skin = `Knight_${this.currentKnightSkin}`; // Met à jour le skin du personnage
         this.selectCharacter(knightCharacter, knightCharacter.card);
     }
 
@@ -244,7 +245,8 @@ class CharacterMenuScene extends Phaser.Scene {
 
         this.elfSprite.play(`Elf_idle_${this.currentElfSkin}`);
 
-        const elfCharacter = this.characters.find((char) => char.name === 'Archer');
+        const elfCharacter = this.characters.find((char) => char.name === 'Elf');
+        elfCharacter.skin = `Elf_${this.currentElfSkin}`; // Met à jour le skin du personnage
         this.selectCharacter(elfCharacter, elfCharacter.card);
     }
 
@@ -260,7 +262,7 @@ class CharacterMenuScene extends Phaser.Scene {
             if (this.selectedCharacter.name === 'Guerrier') {
                 characterInstance = new Knight();
                 characterInstance.skin = "Knight_"+this.currentKnightSkin;
-            } else if (this.selectedCharacter.name === 'Archer') {
+            } else if (this.selectedCharacter.name === 'Elf') {
                 characterInstance = new Rogue();
                 characterInstance.skin = "Elf_"+this.currentElfSkin;
             }
@@ -317,7 +319,7 @@ class CharacterMenuScene extends Phaser.Scene {
                         characterInstance.name = name;
 
                         localStorage.setItem(name, JSON.stringify(characterInstance));
-                        sessionStorage.setItem('character', JSON.stringify(characterInstance));
+                        sessionStorage.setItem(name, JSON.stringify(characterInstance));
 
                         console.log('Personnage sauvegardé :', characterInstance);
 

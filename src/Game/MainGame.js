@@ -39,10 +39,12 @@ const MainGame = () => {
 
 
         if (characterData) {
+            const updatedCharacter = JSON.parse(sessionStorage.getItem(characterData.name));
             game.scene.stop('MainMenu');
             game.scene.stop('CharacterMenuScene');
-            game.scene.start('BossStageScene', { character: characterData });
-        } else {
+            game.scene.start('BossStageScene', { character: updatedCharacter });
+        }
+        else {
             game.scene.start(initialScene);
         }
 
@@ -51,7 +53,7 @@ const MainGame = () => {
         };
 
         window.addEventListener('resize', handleResize);
-        
+
         return () => {
             window.removeEventListener('resize', handleResize);
             game.destroy(true);

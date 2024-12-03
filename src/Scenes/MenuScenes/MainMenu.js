@@ -11,6 +11,9 @@ class MainMenu extends Phaser.Scene {
         super({key: 'MainMenu'});
     }
 
+    init() {
+    }
+
     preload() {
         this.load.image('guillotine', require('../../assets/GUIL.png'));
         this.load.image('background', require('../../assets/sprite/bg3png.jpg'));
@@ -202,12 +205,12 @@ class MainMenu extends Phaser.Scene {
 
     lancerLeJeu(item) {
         console.log('Character selected:', item);
-        sessionStorage.setItem('character', JSON.stringify(item));
+        sessionStorage.setItem(item.name, JSON.stringify(item));
 
         let character;
         if (item.skin.includes("Knight")) {
             character = new Knight();
-        } else if (item.skin.includes("Rogue")) {
+        } else if (item.skin.includes("Elf")) {
             character = new Rogue();
         } else {
             console.error("Unknown character type!");
