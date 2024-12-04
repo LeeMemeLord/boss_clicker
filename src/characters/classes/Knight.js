@@ -2,7 +2,7 @@ import { Sword } from '../loot/loot.js';
 import Character from '../Character.js';
 
 class Knight extends Character {
-    constructor(weapon) {
+    constructor(weapon = new Sword()) {
         super(
             'Knight',
             'Un guerrier robuste avec une armure lourde.',
@@ -17,7 +17,7 @@ class Knight extends Character {
             weapon
         );
 
-        if (!(weapon instanceof Sword) || weapon.type !== 'sword') {
+        if (!weapon.type === 'sword') {
             throw new Error('Les Knights ne peuvent utiliser que des épées.');
         }
 

@@ -3,7 +3,6 @@ import Phaser from 'phaser';
 import elec2 from '../../assets/elc2.png';
 import Knight from "../../characters/classes/Knight";
 import Rogue from "../../characters/classes/Rogue";
-import Character from "../../characters/Character";
 
 class BossStageScene extends Phaser.Scene {
     constructor() {
@@ -93,36 +92,10 @@ class BossStageScene extends Phaser.Scene {
 
         let counter = 0;
 
-        this.add.image(width / 2, height / 2, 'background3').setDisplaySize(width, height);
-
-        this.add.text(width / 2, 20, 'Boss Stage', {fontSize: '32px', fill: '#fff'}).setOrigin(0.5);
-
-        const backButton = this.add.text(10, 10, 'Retour', {
-            fontSize: '24px',
-            fill: '#fff',
-            backgroundColor: '#000',
-            padding: {x: 10, y: 5},
-            borderRadius: 5,
-        })
-            .setInteractive({useHandCursor: true})
-            .on('pointerdown', () => {
-                sessionStorage.clear();
-                this.scene.stop('BossStageScene');
-                this.scene.start('MainMenu');
-            })
-            .on('pointerover', () => {
-                backButton.setStyle({fill: '#ff0'});
-            })
-            .on('pointerout', () => {
-                backButton.setStyle({fill: '#fff'});
-            });
-
-        backButton.setOrigin(0, 0);
-
-        const barHeight = 50;
-        const graphics = this.add.graphics();
-        graphics.fillStyle(0x000000, 1);
-        graphics.fillRect(0, height - barHeight, width, barHeight);
+        this.addBackground(width, height);
+        this.addTitle(width);
+        this.addBackButton();
+        this.addBottomBar(width, height);
 
         const totalNumbers = 10;
         const yPosition8 = (height / totalNumbers) * 8;
@@ -140,228 +113,91 @@ class BossStageScene extends Phaser.Scene {
 
         });
 
+        this.createAnimations();
+        this.initializeCharacterSprite(yPosition8);
+        this.createHealthBar();
+
         if (this.character) {
-            const idleFrames = Array.from({length: 10}, (_, i) => ({
-                key: `${this.skin}${this.number}_idle_${i}`,
-            }));
+            this.initializeInteraction(counter, particles, lineEmitter);
+            this.checkGameOver(counter, particles, lineEmitter);
 
-            this.anims.create({
-                key: `${this.skin}${this.number}_idle`,
-                frames: idleFrames,
-                frameRate: 20,
-                repeat: -1,
-            });
+                // if (this.character.currentHp <= 0 && counter === 0) {
+                //     console.log(`${this.character.name} est KO !`);
+                //     counter++;
+                //     this.characterSprite.play(`${this.skin}${this.number}_dead`).once('animationcomplete', () => {
+                //         particles.setVisible(false);
+                //         lineEmitter.stop();
+                //
+                //         const gameOverText = this.add.text(
+                //             this.cameras.main.centerX,
+                //             this.cameras.main.centerY - 100,
+                //             'Game Over',
+                //             {
+                //                 fontSize: '64px',
+                //                 fill: '#ff0000',
+                //                 stroke: '#000000',
+                //                 strokeThickness: 4,
+                //             }
+                //         ).setOrigin(0.5);
+                //
+                //         // Bouton Retry
+                //         const retryButton = this.add.text(
+                //             this.cameras.main.centerX,
+                //             this.cameras.main.centerY,
+                //             'Retry',
+                //             {
+                //                 fontSize: '32px',
+                //                 fill: '#fff',
+                //                 backgroundColor: '#000',
+                //                 padding: {x: 20, y: 10},
+                //                 borderRadius: 5,
+                //             }
+                //         )
+                //             .setOrigin(0.5)
+                //             .setInteractive({useHandCursor: true})
+                //             .on('pointerdown', () => {
+                //                 this.scene.restart();
+                //             })
+                //             .on('pointerover', () => {
+                //                 retryButton.setStyle({fill: '#ff0'});
+                //             })
+                //             .on('pointerout', () => {
+                //                 retryButton.setStyle({fill: '#fff'});
+                //             });
+                //
+                //         // Bouton Retour
+                //         const backButton = this.add.text(
+                //             this.cameras.main.centerX,
+                //             this.cameras.main.centerY + 60,
+                //             'Retour',
+                //             {
+                //                 fontSize: '32px',
+                //                 fill: '#fff',
+                //                 backgroundColor: '#000',
+                //                 padding: {x: 20, y: 10},
+                //                 borderRadius: 5,
+                //             }
+                //         )
+                //             .setOrigin(0.5)
+                //             .setInteractive({useHandCursor: true})
+                //             .on('pointerdown', () => {
+                //                 sessionStorage.clear();
+                //                 this.scene.stop('BossStageScene');
+                //                 this.scene.start('MainMenu');
+                //             })
+                //             .on('pointerover', () => {
+                //                 backButton.setStyle({fill: '#ff0'});
+                //             })
+                //             .on('pointerout', () => {
+                //                 backButton.setStyle({fill: '#fff'});
+                //             });
+                //
+                //     });
+                //
+                // }
 
-            const attackFrames = Array.from({length: 10}, (_, i) => ({
-                key: `${this.skin}${this.number}_attack_${i}`,
-            }));
-
-            this.anims.create({
-                key: `${this.skin}${this.number}_attack`,
-                frames: attackFrames,
-                frameRate: 20,
-                repeat: 0,
-            });
-
-            const hurtFrames = Array.from({length: 10}, (_, i) => ({
-                key: `${this.skin}${this.number}_hurt_${i}`,
-            }));
-
-            this.anims.create({
-                key: `${this.skin}${this.number}_hurt`,
-                frames: hurtFrames,
-                frameRate: 20,
-                repeat: 0,
-            });
-
-            const deadFrames = Array.from({length: 10}, (_, i) => ({
-                key: `${this.skin}${this.number}_dead_${i}`,
-            }));
-
-            this.anims.create({
-                key: `${this.skin}${this.number}_dead`,
-                frames: deadFrames,
-                frameRate: 20,
-                repeat: 0,
-            });
-
-            if (this.characterSprite) {
-                this.characterSprite.destroy();
-            }
-
-            if (this.character.skin.includes('Knight')) {
-                this.characterSprite = this.add.sprite(200, yPosition8 - 75, `${this.skin}${this.number}_idle_0`)
-                    .play(`${this.skin}${this.number}_idle`)
-                    .setDisplaySize(400, 500)
-                    .setOrigin(0.5);
-            } else if (this.character.skin.includes('Elf')) {
-                this.characterSprite = this.add.sprite(200, yPosition8 - 145, `${this.skin}${this.number}_idle_0`)
-                    .play(`${this.skin}${this.number}_idle`)
-                    .setDisplaySize(400, 500)
-                    .setOrigin(0.5);
-            }
-
-            const maxHealth = this.character.stats.hp;
-
-            const healthBarWidth = 200;
-            const healthBarHeight = 20;
-            const healthBarX = this.characterSprite.x - healthBarWidth / 2;
-            const healthBarY = this.characterSprite.y - 200;
-            const healthBarBackground = this.add.graphics();
-            healthBarBackground.fillStyle(0xff0000, 1);
-            healthBarBackground.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
-
-            const healthBar = this.add.graphics();
-            healthBar.fillStyle(0x00ff00, 1);
-            healthBar.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
-
-            const updateHealthBar = () => {
-                healthBar.clear();
-                const healthPercentage = this.character.currentHp / maxHealth;
-                healthBar.fillStyle(0x00ff00, 1);
-                healthBar.fillRect(healthBarX, healthBarY, healthBarWidth * healthPercentage, healthBarHeight);
-            };
-
-            const showDamageText = (x, y, damage) => {
-                const damageText = this.add.text(x, y, `-${damage}`, {
-                    fontSize: '42px',
-                    fill: '#ff0000',
-                    stroke: '#000000',
-                    strokeThickness: 2,
-                }).setOrigin(0.5);
-
-                this.tweens.add({
-                    targets: damageText,
-                    y: y - 50,
-                    alpha: 0,
-                    duration: 1000,
-                    ease: 'Power1',
-                    onComplete: () => damageText.destroy(),
-                });
-            };
-
-            if (!this.character.currentHp <= 0 || counter === 0) {
-                this.input.on('pointerdown', (pointer) => {
-
-                    console.log(counter)
-                    if (counter === 0) {
-                        this.characterSprite.play(`${this.skin}${this.number}_attack`);
-                        this.characterSprite.on('animationcomplete', (animation) => {
-                            if (animation.key === `${this.skin}${this.number}_attack`) {
-                                this.characterSprite.play(`${this.skin}${this.number}_idle`);
-                            }
-                        });
-                    }
-
-                    const emitter = particles.createEmitter({
-                        x: pointer.x,
-                        y: pointer.y,
-                        speed: {min: 100, max: 200},
-                        angle: {min: 0, max: 360},
-                        scale: {start: 0.1, end: 0},
-                        lifespan: 300,
-                        rotate: {start: 0, end: 360},
-                        blendMode: 'ADD',
-                    });
-
-                    lineEmitter.setPosition(this.characterSprite.x, this.characterSprite.y);
-                    lineEmitter.setEmitZone({
-                        type: 'edge',
-                        source: new Phaser.Geom.Line(this.characterSprite.x, this.characterSprite.y, pointer.x, pointer.y),
-                        quantity: 50,
-                    });
-                    lineEmitter.start();
-
-                    this.time.delayedCall(500, () => {
-                        emitter.stop();
-                        lineEmitter.stop();
-                    });
-                    if (!this.character.currentHp <= 0) {
-                        let damage = this.character.attackEnemy(this.character);
-
-                        updateHealthBar();
-
-                        showDamageText(this.characterSprite.x, this.characterSprite.y - 100, damage);
-                    }
-
-                    if (this.character.currentHp <= 0 && counter === 0) {
-                        console.log(`${this.character.name} est KO !`);
-                        counter++;
-                        this.characterSprite.play(`${this.skin}${this.number}_dead`).once('animationcomplete', () => {
-                            particles.setVisible(false);
-                            lineEmitter.stop();
-
-                            const gameOverText = this.add.text(
-                                this.cameras.main.centerX,
-                                this.cameras.main.centerY - 100,
-                                'Game Over',
-                                {
-                                    fontSize: '64px',
-                                    fill: '#ff0000',
-                                    stroke: '#000000',
-                                    strokeThickness: 4,
-                                }
-                            ).setOrigin(0.5);
-
-                            // Bouton Retry
-                            const retryButton = this.add.text(
-                                this.cameras.main.centerX,
-                                this.cameras.main.centerY,
-                                'Retry',
-                                {
-                                    fontSize: '32px',
-                                    fill: '#fff',
-                                    backgroundColor: '#000',
-                                    padding: {x: 20, y: 10},
-                                    borderRadius: 5,
-                                }
-                            )
-                                .setOrigin(0.5)
-                                .setInteractive({useHandCursor: true})
-                                .on('pointerdown', () => {
-                                    this.scene.restart();
-                                })
-                                .on('pointerover', () => {
-                                    retryButton.setStyle({fill: '#ff0'});
-                                })
-                                .on('pointerout', () => {
-                                    retryButton.setStyle({fill: '#fff'});
-                                });
-
-                            // Bouton Retour
-                            const backButton = this.add.text(
-                                this.cameras.main.centerX,
-                                this.cameras.main.centerY + 60,
-                                'Retour',
-                                {
-                                    fontSize: '32px',
-                                    fill: '#fff',
-                                    backgroundColor: '#000',
-                                    padding: {x: 20, y: 10},
-                                    borderRadius: 5,
-                                }
-                            )
-                                .setOrigin(0.5)
-                                .setInteractive({useHandCursor: true})
-                                .on('pointerdown', () => {
-                                    sessionStorage.clear();
-                                    this.scene.stop('BossStageScene');
-                                    this.scene.start('MainMenu');
-                                })
-                                .on('pointerover', () => {
-                                    backButton.setStyle({fill: '#ff0'});
-                                })
-                                .on('pointerout', () => {
-                                    backButton.setStyle({fill: '#fff'});
-                                });
-
-                        });
-
-                    }
-
-                });
-            }
         }
+
         const bossFrames = Array.from({length: 10}, (_, i) => ({
             key: `Boss${this.bossId}_idle_${i}`,
         }));
@@ -381,10 +217,10 @@ class BossStageScene extends Phaser.Scene {
             key: `Boss${this.bossId}_hurt`,
             frames: hurtFrames,
             frameRate: 20,
-            repeat: 0, // Ne joue qu'une seule fois
+            repeat: 0,
         });
 
-        this.bossSprite = this.add.sprite(width - 200, height / 2 - 85, `Boss${this.bossId}_idle_0`)
+        this.bossSprite = this.add.sprite(width - 200, height / 2 - 20, `Boss${this.bossId}_idle_0`)
             .play(`Boss${this.bossId}_idle`)
             .setDisplaySize(600, 800)
             .setOrigin(0.5);
@@ -395,10 +231,10 @@ class BossStageScene extends Phaser.Scene {
         const bossHealthBarWidth = 400;
         const bossHealthBarHeight = 30;
         const bossHealthBarX = this.bossSprite.x - bossHealthBarWidth / 2;
-        const bossHealthBarY = this.bossSprite.y - 350;
+        const bossHealthBarY = this.bossSprite.y - 150;
 
         const bossHealthBarBackground = this.add.graphics();
-        bossHealthBarBackground.fillStyle(0x000000, 1);
+        bossHealthBarBackground.fillStyle(0xff0000, 1);
         bossHealthBarBackground.fillRect(bossHealthBarX, bossHealthBarY, bossHealthBarWidth, bossHealthBarHeight);
 
         const bossHealthBar = this.add.graphics();
@@ -424,7 +260,7 @@ class BossStageScene extends Phaser.Scene {
 
         this.bossSprite.setInteractive();
         this.bossSprite.on('pointerdown', () => {
-            const damage = 20; // Example damage
+            const damage = 20;
             this.boss.stats.hp -= damage;
             updateBossHealthBar();
             this.bossSprite.setTint(0xff0000);
@@ -468,6 +304,318 @@ class BossStageScene extends Phaser.Scene {
             },
         });
     }
+
+    addBackground(width, height) {
+        this.add.image(width / 2, height / 2, 'background3').setDisplaySize(width, height);
+    }
+
+    addTitle(width) {
+        this.add.text(width / 2, 20, 'Boss Stage', {
+            fontSize: '32px',
+            fill: '#fff'
+        }).setOrigin(0.5);
+    }
+
+    addBackButton() {
+        console.log('addBackButton called');
+
+        const backButton = this.add.text(10, 10, 'Retour', {
+            fontSize: '24px',
+            fill: '#fff',
+            backgroundColor: '#000',
+            padding: {x: 10, y: 5},
+            borderRadius: 5,
+        })
+            .setInteractive({useHandCursor: true})
+            .on('pointerdown', () => {
+                sessionStorage.clear();
+                this.scene.stop('BossStageScene');
+                this.scene.start('MainMenu');
+            })
+            .on('pointerover', () => {
+                backButton.setStyle({fill: '#ff0'});
+            })
+            .on('pointerout', () => {
+                backButton.setStyle({fill: '#fff'});
+            });
+        backButton.setOrigin(0, 0);
+    }
+
+
+    addBottomBar(width, height) {
+        const barHeight = 50;
+        const graphics = this.add.graphics();
+        graphics.fillStyle(0x000000, 1);
+        graphics.fillRect(0, height - barHeight, width, barHeight);
+    }
+
+    createAnimations() {
+        this.createIdleAnimation();
+        this.createAttackAnimation();
+        this.createHurtAnimation();
+        this.createDeadAnimation();
+    }
+
+    createIdleAnimation() {
+        const idleFrames = Array.from({length: 10}, (_, i) => ({
+            key: `${this.skin}${this.number}_idle_${i}`,
+        }));
+
+        this.anims.create({
+            key: `${this.skin}${this.number}_idle`,
+            frames: idleFrames,
+            frameRate: 20,
+            repeat: -1,
+        });
+    }
+
+    createAttackAnimation() {
+        const attackFrames = Array.from({length: 10}, (_, i) => ({
+            key: `${this.skin}${this.number}_attack_${i}`,
+        }));
+
+        this.anims.create({
+            key: `${this.skin}${this.number}_attack`,
+            frames: attackFrames,
+            frameRate: 20,
+            repeat: 0,
+        });
+    }
+
+    createHurtAnimation() {
+        const hurtFrames = Array.from({length: 10}, (_, i) => ({
+            key: `${this.skin}${this.number}_hurt_${i}`,
+        }));
+
+        this.anims.create({
+            key: `${this.skin}${this.number}_hurt`,
+            frames: hurtFrames,
+            frameRate: 20,
+            repeat: 0,
+        });
+    }
+
+    createDeadAnimation() {
+        const deadFrames = Array.from({length: 10}, (_, i) => ({
+            key: `${this.skin}${this.number}_dead_${i}`,
+        }));
+
+        this.anims.create({
+            key: `${this.skin}${this.number}_dead`,
+            frames: deadFrames,
+            frameRate: 20,
+            repeat: 0,
+        });
+    }
+
+    initializeCharacterSprite(yPosition8) {
+        if (this.characterSprite) {
+            this.characterSprite.destroy();
+        }
+
+        const spriteKey = `${this.skin}${this.number}_idle_0`;
+        const spritePosition = this.character.skin.includes('Knight')
+            ? {x: 200, y: yPosition8 - 75}
+            : {x: 200, y: yPosition8 - 145};
+
+        this.characterSprite = this.add.sprite(spritePosition.x, spritePosition.y, spriteKey)
+            .play(`${this.skin}${this.number}_idle`)
+            .setDisplaySize(400, 500)
+            .setOrigin(0.5);
+    }
+
+    createHealthBar() {
+        const maxHealth = this.character.stats.hp;
+
+        const healthBarWidth = 200;
+        const healthBarHeight = 20;
+        const healthBarX = this.characterSprite.x - healthBarWidth / 2;
+        const healthBarY = this.characterSprite.y - 150;
+
+        // Fond rouge pour la barre de santé
+        this.healthBarBackground = this.add.graphics();
+        this.healthBarBackground.fillStyle(0xff0000, 1);
+        this.healthBarBackground.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
+
+        // Barre de santé verte
+        this.healthBar = this.add.graphics();
+        this.healthBar.fillStyle(0x00ff00, 1);
+        this.healthBar.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
+
+        // Fonction pour mettre à jour la barre de santé
+        this.updateHealthBar = () => {
+            const healthPercentage = this.character.currentHp / maxHealth;
+            this.healthBar.clear();
+            this.healthBar.fillStyle(0x00ff00, 1);
+            this.healthBar.fillRect(healthBarX, healthBarY, healthBarWidth * healthPercentage, healthBarHeight);
+        };
+    }
+
+    showDamageText(x, y, damage) {
+        const damageText = this.add.text(x, y, `-${damage}`, {
+            fontSize: '42px',
+            fill: '#ff0000',
+            stroke: '#000000',
+            strokeThickness: 2,
+        }).setOrigin(0.5);
+
+        this.tweens.add({
+            targets: damageText,
+            y: y - 50,
+            alpha: 0,
+            duration: 1000,
+            ease: 'Power1',
+            onComplete: () => damageText.destroy(),
+        });
+    }
+
+    initializeInteraction(counter, particles, lineEmitter) {
+        if (this.character.currentHp > 0 && counter === 0) {
+            this.input.on('pointerdown', (pointer) => {
+                this.handlePointerDown(pointer, counter, particles, lineEmitter);
+            });
+        }
+    }
+
+    handlePointerDown(pointer, counter, particles, lineEmitter) {
+        console.log(counter);
+
+        if (counter === 0) {
+            this.playAttackAnimation();
+        }
+
+        this.createParticleEffect(pointer,lineEmitter,particles);
+
+        if (this.character.currentHp > 0) {
+            const damage = this.character.attackEnemy(this.character);
+            this.updateHealthBar();
+            this.showDamageText(this.characterSprite.x, this.characterSprite.y - 100, damage);
+        }
+    }
+
+    playAttackAnimation() {
+        this.characterSprite.play(`${this.skin}${this.number}_attack`);
+        this.characterSprite.on('animationcomplete', (animation) => {
+            if (animation.key === `${this.skin}${this.number}_attack`) {
+                this.characterSprite.play(`${this.skin}${this.number}_idle`);
+            }
+        });
+    }
+
+    createParticleEffect(pointer, lineEmitter,particles) {
+        const emitter = particles.createEmitter({
+            x: pointer.x,
+            y: pointer.y,
+            speed: {min: 100, max: 200},
+            angle: {min: 0, max: 360},
+            scale: {start: 0.1, end: 0},
+            lifespan: 300,
+            rotate: {start: 0, end: 360},
+            blendMode: 'ADD',
+        });
+
+        lineEmitter.setPosition(this.characterSprite.x, this.characterSprite.y);
+        lineEmitter.setEmitZone({
+            type: 'edge',
+            source: new Phaser.Geom.Line(this.characterSprite.x, this.characterSprite.y, pointer.x, pointer.y),
+            quantity: 50,
+        });
+
+        lineEmitter.start();
+
+        this.time.delayedCall(500, () => {
+            emitter.stop();
+            lineEmitter.stop();
+        });
+    }
+
+    checkGameOver(counter, particles, lineEmitter) {
+        if (this.character.currentHp <= 0 && counter === 0) {
+            console.log(`${this.character.name} est KO !`);
+            counter++;
+            this.handleCharacterDeath(particles, lineEmitter);
+        }
+    }
+
+    handleCharacterDeath(particles, lineEmitter) {
+        this.characterSprite.play(`${this.skin}${this.number}_dead`).once('animationcomplete', () => {
+            particles.setVisible(false);
+            lineEmitter.stop();
+            this.showGameOverUI();
+        });
+    }
+
+    showGameOverUI() {
+        const gameOverText = this.add.text(
+            this.cameras.main.centerX,
+            this.cameras.main.centerY - 100,
+            'Game Over',
+            {
+                fontSize: '64px',
+                fill: '#ff0000',
+                stroke: '#000000',
+                strokeThickness: 4,
+            }
+        ).setOrigin(0.5);
+
+        this.createRetryButton();
+        this.createBackButton();
+    }
+
+    createRetryButton() {
+        const retryButton = this.add.text(
+            this.cameras.main.centerX,
+            this.cameras.main.centerY,
+            'Retry',
+            {
+                fontSize: '32px',
+                fill: '#fff',
+                backgroundColor: '#000',
+                padding: { x: 20, y: 10 },
+                borderRadius: 5,
+            }
+        )
+            .setOrigin(0.5)
+            .setInteractive({ useHandCursor: true })
+            .on('pointerdown', () => {
+                this.scene.restart();
+            })
+            .on('pointerover', () => {
+                retryButton.setStyle({ fill: '#ff0' });
+            })
+            .on('pointerout', () => {
+                retryButton.setStyle({ fill: '#fff' });
+            });
+    }
+
+    createBackButton() {
+        const backButton = this.add.text(
+            this.cameras.main.centerX,
+            this.cameras.main.centerY + 60,
+            'Retour',
+            {
+                fontSize: '32px',
+                fill: '#fff',
+                backgroundColor: '#000',
+                padding: { x: 20, y: 10 },
+                borderRadius: 5,
+            }
+        )
+            .setOrigin(0.5)
+            .setInteractive({ useHandCursor: true })
+            .on('pointerdown', () => {
+                sessionStorage.clear();
+                this.scene.stop('BossStageScene');
+                this.scene.start('MainMenu');
+            })
+            .on('pointerover', () => {
+                backButton.setStyle({ fill: '#ff0' });
+            })
+            .on('pointerout', () => {
+                backButton.setStyle({ fill: '#fff' });
+            });
+    }
+
 }
 
 export default BossStageScene;
