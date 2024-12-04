@@ -1,11 +1,10 @@
 import Phaser from 'phaser';
 import Knight from "../../characters/classes/Knight";
 import Rogue from "../../characters/classes/Rogue";
-import sparkBleu from '../../assets/sprite/blue_spark.png';
 import fireSpark from '../../assets/sprite/flame2.png';
-import background2 from '../../assets/sprite/bg3png.jpg';
 import cursor from '../../assets/sprite/Normal.cur';
 import swordLogo from '../../assets/sword_logo.png';
+import {Bow, Sword} from "../../characters/loot/loot";
 
 class CharacterMenuScene extends Phaser.Scene {
     constructor() {
@@ -236,7 +235,9 @@ class CharacterMenuScene extends Phaser.Scene {
         this.knightSprite.play(`Knight_idle_${this.currentKnightSkin}`);
 
         const knightCharacter = this.characters.find((char) => char.name === 'Guerrier');
-        knightCharacter.skin = `Knight_${this.currentKnightSkin}`; // Met à jour le skin du personnage
+
+        knightCharacter.skin = `Knight_${this.currentKnightSkin}`;
+
         this.selectCharacter(knightCharacter, knightCharacter.card);
     }
 
@@ -245,14 +246,18 @@ class CharacterMenuScene extends Phaser.Scene {
 
         this.elfSprite.play(`Elf_idle_${this.currentElfSkin}`);
 
-        const elfCharacter = this.characters.find((char) => char.name === 'Elf');
+        const elfCharacter = this.characters.find((char) => char.name === 'Elf')
+
         elfCharacter.skin = `Elf_${this.currentElfSkin}`; // Met à jour le skin du personnage
+
         this.selectCharacter(elfCharacter, elfCharacter.card);
     }
 
     selectCharacter(character, card) {
         this.characters.forEach((char) => char.card.setFillStyle(0x8B4513));
+
         this.selectedCharacter = character;
+
         card.setFillStyle(0xDAA520);
     }
 
@@ -260,13 +265,16 @@ class CharacterMenuScene extends Phaser.Scene {
         if (this.selectedCharacter) {
             let characterInstance;
             if (this.selectedCharacter.name === 'Guerrier') {
-                characterInstance = new Knight();
-                characterInstance.skin = "Knight_"+this.currentKnightSkin;
-            } else if (this.selectedCharacter.name === 'Elf') {
-                characterInstance = new Rogue();
-                characterInstance.skin = "Elf_"+this.currentElfSkin;
-            }
+                const sword = new Sword();
+                characterInstance = new Knight(sword);
 
+                characterInstance.skin = `Knight_${this.currentKnightSkin}`;
+            } else if (this.selectedCharacter.name === 'Elf') {
+                const bow = new Bow();
+                characterInstance = new Rogue(bow);
+
+                characterInstance.skin = `Elf_${this.currentElfSkin}`;
+            }
             this.showNameInputDialog(characterInstance);
         } else {
             alert('Veuillez sélectionner un personnage avant de continuer.');

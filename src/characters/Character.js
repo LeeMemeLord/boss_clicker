@@ -1,5 +1,7 @@
+import {Sword} from "./loot/loot";
+
 class Character {
-    constructor(name, description, baseStats) {
+    constructor(name, description, baseStats, weapon) {
         this.name = name;
         this.description = description;
         this.level = 1;
@@ -12,14 +14,21 @@ class Character {
             crit: baseStats.crit,
             lifeSteal: baseStats.lifeSteal,
         };
+        this.weapon = weapon;
         this.currentHp = this.stats.hp;
     }
 
     attackEnemy(enemy) {
-        const isCrit = Math.random() < this.stats.crit;
-        const damage = isCrit
-            ? this.stats.atk * 2
-            : this.stats.atk;
+        if (!this.weapon) {
+            console.error('Aucune arme équipée. Impossible d’attaquer.');
+            return 0;
+        }
+
+        const isCrit =
+            Math.random() < this.stats.crit || Math.random() < this.weapon.crit;
+
+        const baseDamage = this.stats.atk + this.weapon.damage;
+        const damage = isCrit ? baseDamage * 2 : baseDamage;
 
         const finalDamage = Math.max(damage - enemy.stats.def, 0);
         enemy.currentHp = Math.max(enemy.currentHp - finalDamage, 0);
@@ -29,7 +38,7 @@ class Character {
         if (enemy.currentHp === 0) {
             console.log(`${enemy.name} est vaincu !`);
         }
-        // Vol de vie aleatoire du pourcentage de vieSteal
+
         const isLifeSteal = Math.random() < this.stats.lifeSteal;
         const lifeStealAmount = isLifeSteal ? finalDamage * this.stats.lifeSteal : 0;
         this.currentHp = Math.min(this.currentHp + lifeStealAmount, this.stats.hp);
@@ -41,6 +50,13 @@ class Character {
         );
 
         return finalDamage;
+    }
+
+
+
+    changeWeapon(newWeapon) {
+        this.weapon = newWeapon;
+        console.log(`${this.name} a équipé une nouvelle arme : ${newWeapon.name}`);
     }
 
 

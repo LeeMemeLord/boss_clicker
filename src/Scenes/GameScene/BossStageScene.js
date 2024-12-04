@@ -18,17 +18,19 @@ class BossStageScene extends Phaser.Scene {
         this.character = null;
         this.skin = null;
         this.number = null;
-
         if (data.character) {
+            console.log('Données du personnage hghgfhgf:', data.character);
             if (data.character.skin.includes('Knight')) {
-                this.character = new Knight(data.character.name, data.character.description, data.character.stats);
+                this.character = new Knight();
+
             } else if (data.character.skin.includes('Elf')) {
-                this.character = new Rogue(data.character.name, data.character.description, data.character.stats);
+                this.character = new Rogue();
             }
             Object.assign(this.character, data.character);
-
             this.number = this.character.skin.match(/\d+/)[0];
             this.skin = this.character.skin.replace(`_${this.number}`, '');
+
+            this.bossId = Phaser.Math.Between(1, 3); // 1, 2 ou 3
         }
     }
 
@@ -60,24 +62,34 @@ class BossStageScene extends Phaser.Scene {
                 );
             }
         }
+
+        for (let i = 0; i <= 9; i++) {
+            this.load.image(
+                `Boss${this.bossId}_idle_${i}`,
+                require(`../../assets/sprite_Boss/_PNG/${this.bossId}_TROLL/Troll_0${this.bossId}_1_IDLE_00${i}.png`)
+            );
+
+            this.load.image(
+                `Boss${this.bossId}_attack_${i}`,
+                require(`../../assets/sprite_Boss/_PNG/${this.bossId}_TROLL/Troll_0${this.bossId}_1_ATTACK_00${i}.png`)
+            );
+
+            this.load.image(
+                `Boss${this.bossId}_hurt_${i}`,
+                require(`../../assets/sprite_Boss/_PNG/${this.bossId}_TROLL/Troll_0${this.bossId}_1_HURT_00${i}.png`)
+            );
+
+            this.load.image(
+                `Boss${this.bossId}_dead_${i}`,
+                require(`../../assets/sprite_Boss/_PNG/${this.bossId}_TROLL/Troll_0${this.bossId}_1_DIE_00${i}.png`) // Supprimé l'extraire _
+            );
+        }
+
+
     }
 
     create() {
         const {width, height} = this.sys.game.config;
-
-        this.time.delayedCall(10000, () => {
-
-            this.cameras.main.shake(500, 0.02);
-
-            this.time.delayedCall(500, () => {
-                this.add.text(width / 2, height / 2, 'Attention!', {
-                    fontSize: '48px',
-                    fill: '#ff0000',
-                    stroke: '#000',
-                    strokeThickness: 4,
-                }).setOrigin(0.5);
-            });
-        });
 
         let counter = 0;
 
@@ -111,14 +123,6 @@ class BossStageScene extends Phaser.Scene {
         const graphics = this.add.graphics();
         graphics.fillStyle(0x000000, 1);
         graphics.fillRect(0, height - barHeight, width, barHeight);
-
-        const enemy = new Character('Boss', 'Un boss puissant', {
-            hp: 200,
-            atk: 15,
-            def: 5,
-            crit: 0.1,
-            lifeSteal: 0,
-        });
 
         const totalNumbers = 10;
         const yPosition8 = (height / totalNumbers) * 8;
@@ -182,7 +186,7 @@ class BossStageScene extends Phaser.Scene {
             });
 
             if (this.characterSprite) {
-                this.characterSprite.destroy(); // Supprime l'ancien sprite s'il existe
+                this.characterSprite.destroy();
             }
 
             if (this.character.skin.includes('Knight')) {
@@ -190,16 +194,12 @@ class BossStageScene extends Phaser.Scene {
                     .play(`${this.skin}${this.number}_idle`)
                     .setDisplaySize(400, 500)
                     .setOrigin(0.5);
-            }
-            else if (this.character.skin.includes('Elf')) {
+            } else if (this.character.skin.includes('Elf')) {
                 this.characterSprite = this.add.sprite(200, yPosition8 - 145, `${this.skin}${this.number}_idle_0`)
                     .play(`${this.skin}${this.number}_idle`)
                     .setDisplaySize(400, 500)
                     .setOrigin(0.5);
             }
-
-
-
 
             const maxHealth = this.character.stats.hp;
 
@@ -362,6 +362,79 @@ class BossStageScene extends Phaser.Scene {
                 });
             }
         }
+        const bossFrames = Array.from({length: 10}, (_, i) => ({
+            key: `Boss${this.bossId}_idle_${i}`,
+        }));
+
+        this.anims.create({
+            key: `Boss${this.bossId}_idle`,
+            frames: bossFrames,
+            frameRate: 20,
+            repeat: -1,
+        });
+
+        const hurtFrames = Array.from({length: 10}, (_, i) => ({
+            key: `Boss${this.bossId}_hurt_${i}`,
+        }));
+
+        this.anims.create({
+            key: `Boss${this.bossId}_hurt`,
+            frames: hurtFrames,
+            frameRate: 20,
+            repeat: 0, // Ne joue qu'une seule fois
+        });
+
+        this.bossSprite = this.add.sprite(width - 200, height / 2 - 85, `Boss${this.bossId}_idle_0`)
+            .play(`Boss${this.bossId}_idle`)
+            .setDisplaySize(600, 800)
+            .setOrigin(0.5);
+
+        this.bossSprite.scaleX = -1;
+
+        const bossMaxHealth = 300;
+        const bossHealthBarWidth = 400;
+        const bossHealthBarHeight = 30;
+        const bossHealthBarX = this.bossSprite.x - bossHealthBarWidth / 2;
+        const bossHealthBarY = this.bossSprite.y - 350;
+
+        const bossHealthBarBackground = this.add.graphics();
+        bossHealthBarBackground.fillStyle(0x000000, 1);
+        bossHealthBarBackground.fillRect(bossHealthBarX, bossHealthBarY, bossHealthBarWidth, bossHealthBarHeight);
+
+        const bossHealthBar = this.add.graphics();
+        bossHealthBar.fillStyle(0x00ff00, 1);
+        bossHealthBar.fillRect(bossHealthBarX, bossHealthBarY, bossHealthBarWidth, bossHealthBarHeight);
+
+        const updateBossHealthBar = () => {
+            const healthPercentage = this.boss.stats.hp / bossMaxHealth;
+            bossHealthBar.clear();
+            bossHealthBar.fillStyle(0x00ff00, 1);
+            bossHealthBar.fillRect(bossHealthBarX, bossHealthBarY, bossHealthBarWidth * healthPercentage, bossHealthBarHeight);
+        };
+
+        this.boss = {
+            stats: {
+                hp: bossMaxHealth,
+                atk: 20,
+                def: 10,
+                crit: 0.15,
+                lifeSteal: 0,
+            },
+        };
+
+        this.bossSprite.setInteractive();
+        this.bossSprite.on('pointerdown', () => {
+            const damage = 20; // Example damage
+            this.boss.stats.hp -= damage;
+            updateBossHealthBar();
+            this.bossSprite.setTint(0xff0000);
+            this.time.delayedCall(100, () => this.bossSprite.clearTint());
+
+            if (this.boss.stats.hp <= 0) {
+                this.bossSprite.play(`Boss${this.bossId}_dead`);
+            }
+        });
+
 
         const baseY = height - 50 / 2;
         const text = 'Réalisé par LeeMemeLord';
@@ -395,17 +468,6 @@ class BossStageScene extends Phaser.Scene {
             },
         });
     }
-
-    clearAnimations() {
-        const animations = this.anims.anims.entries;
-        Object.keys(animations).forEach((key) => {
-            if (key.includes(this.skin)) {
-                this.anims.remove(key);
-            }
-        });
-        this.children.removeAll();
-    }
-
 }
 
 export default BossStageScene;
