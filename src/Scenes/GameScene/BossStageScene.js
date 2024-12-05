@@ -91,6 +91,7 @@ class BossStageScene extends Phaser.Scene {
         this.addBackButton();
         this.addBottomBar(width, height);
         this.addImagePlaceholder(width, height);
+        
 
         const totalNumbers = 10;
         const yPosition8 = (height / totalNumbers) * 8;
