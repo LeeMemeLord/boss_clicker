@@ -67,6 +67,7 @@ class Character {
         while (this.exp >= this.getExpToLevelUp()) {
             this.levelUp();
         }
+        console.log(`${this.name} EXP: ${this.exp}/${this.getExpToLevelUp()}`);
     }
 
     levelUp() {
@@ -81,6 +82,20 @@ class Character {
         this.stats.crit = Math.min(this.stats.crit + 0.01, 1);
         this.stats.lifeSteal = Math.min(this.stats.lifeSteal + 0.01, 1);
         this.currentHp = this.stats.hp;
+        sessionStorage.setItem(this.name, JSON.stringify(this));
+        localStorage.setItem(this.name, JSON.stringify(this));
+    }
+
+    setLevel(level) {
+        this.level = level;
+        this.exp = 0;
+        this.stats.hp += 10 * level;
+        this.stats.atk += 2 * level;
+        this.stats.def += 2 * level;
+        this.stats.crit = Math.min(this.stats.crit + 0.01 * level, 1);
+        this.stats.lifeSteal = Math.min(this.stats.lifeSteal + 0.01 * level, 1);
+        this.currentHp = this.stats.hp;
+
     }
 
     getExpToLevelUp() {

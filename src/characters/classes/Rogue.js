@@ -2,7 +2,9 @@ import { Bow } from '../loot/loot.js';
 import Character from '../Character.js';
 
 class Rogue extends Character {
-    constructor(weapon = new Bow()) {
+    constructor(weapon = null) {
+        const defaultWeapon = weapon || new Bow('Wooden Bow', 'common', 1, 1,"bow");
+
         super(
             'Rogue',
             'Un guerrier agile maîtrisant les arcs.',
@@ -14,13 +16,12 @@ class Rogue extends Character {
                 lifeSteal: 0.05,
                 skin: 'Rogue_1',
             },
-            weapon
+            defaultWeapon
         );
 
-        if (!(weapon.type === 'bow')){
+        if (defaultWeapon.type !== 'bow') {
             throw new Error('Les Rogues ne peuvent utiliser que des arcs.');
         }
-
     }
 }
 

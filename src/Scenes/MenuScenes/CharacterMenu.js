@@ -265,13 +265,11 @@ class CharacterMenuScene extends Phaser.Scene {
         if (this.selectedCharacter) {
             let characterInstance;
             if (this.selectedCharacter.name === 'Guerrier') {
-                const sword = new Sword();
-                characterInstance = new Knight(sword);
+                characterInstance = new Knight();
 
                 characterInstance.skin = `Knight_${this.currentKnightSkin}`;
             } else if (this.selectedCharacter.name === 'Elf') {
-                const bow = new Bow();
-                characterInstance = new Rogue(bow);
+                characterInstance = new Rogue();
 
                 characterInstance.skin = `Elf_${this.currentElfSkin}`;
             }

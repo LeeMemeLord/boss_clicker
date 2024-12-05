@@ -2,7 +2,9 @@ import { Sword } from '../loot/loot.js';
 import Character from '../Character.js';
 
 class Knight extends Character {
-    constructor(weapon = new Sword()) {
+    constructor(weapon = null) {
+        const defaultWeapon = weapon || new Sword('Rusty Sword', 'common', 1, 1, 'sword');
+
         super(
             'Knight',
             'Un guerrier robuste avec une armure lourde.',
@@ -14,14 +16,14 @@ class Knight extends Character {
                 lifeSteal: 0.02,
                 skin: 'Knight_1',
             },
-            weapon
+            defaultWeapon
         );
 
-        if (!weapon.type === 'sword') {
+        // Vérification pour s'assurer que l'arme est une épée
+        if (defaultWeapon.type !== 'sword') {
             throw new Error('Les Knights ne peuvent utiliser que des épées.');
         }
-
     }
-
 }
+
 export default Knight;
