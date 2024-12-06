@@ -22,7 +22,7 @@ class CharacterMenuScene extends Phaser.Scene {
     }
 
     preload() {
-        for (let skin = 1; skin <= 3; skin++) {
+        for (let skin = 1; skin <= 2; skin++) {
             for (let i = 0; i <= 9; i++) {
                 this.load.image(`Knight_${skin}_idle_${i}`, require(`../../assets/sprite/_PNG/${skin}_KNIGHT/Knight_0${skin}__IDLE_00${i}.png`));
             }
