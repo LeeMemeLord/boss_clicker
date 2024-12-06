@@ -27,7 +27,7 @@ class CharacterMenuScene extends Phaser.Scene {
                 this.load.image(`Knight_${skin}_idle_${i}`, require(`../../assets/sprite/_PNG/${skin}_KNIGHT/Knight_0${skin}__IDLE_00${i}.png`));
             }
         }
-        for (let skin = 1; skin <= 3; skin++) {
+        for (let skin = 1; skin <= 2; skin++) {
             for (let i = 0; i <= 9; i++) {
                 this.load.image(`Elf_${skin}_idle_${i}`, require(`../../assets/sprite/_PNG/${skin}_ELF/Elf_0${skin}__IDLE_00${i}.png`));
             }
@@ -48,7 +48,7 @@ class CharacterMenuScene extends Phaser.Scene {
             color: '#ffffff',
         }).setOrigin(0.5);
 
-        for (let skin = 1; skin <= 3; skin++) {
+        for (let skin = 1; skin <= 2; skin++) {
             const frames = Array.from({length: 10}, (_, i) => ({key: `Knight_${skin}_idle_${i}`}));
             this.anims.create({
                 key: `Knight_idle_${skin}`,
@@ -58,7 +58,7 @@ class CharacterMenuScene extends Phaser.Scene {
             });
         }
 
-        for (let skin = 1; skin <= 3; skin++) {
+        for (let skin = 1; skin <= 2; skin++) {
             const frames = Array.from({length: 10}, (_, i) => ({key: `Elf_${skin}_idle_${i}`}));
             this.anims.create({
                 key: `Elf_idle_${skin}`,
@@ -228,7 +228,7 @@ class CharacterMenuScene extends Phaser.Scene {
     }
 
     changeKnightSkin(direction) {
-        this.currentKnightSkin = Phaser.Math.Wrap(this.currentKnightSkin + direction, 1, 4);
+        this.currentKnightSkin = Phaser.Math.Wrap(this.currentKnightSkin + direction, 1, 3);
 
         this.knightSprite.play(`Knight_idle_${this.currentKnightSkin}`);
 
@@ -240,7 +240,7 @@ class CharacterMenuScene extends Phaser.Scene {
     }
 
     changeElfSkin(direction) {
-        this.currentElfSkin = Phaser.Math.Wrap(this.currentElfSkin + direction, 1, 4);
+        this.currentElfSkin = Phaser.Math.Wrap(this.currentElfSkin + direction, 1, 3);
 
         this.elfSprite.play(`Elf_idle_${this.currentElfSkin}`);
 
