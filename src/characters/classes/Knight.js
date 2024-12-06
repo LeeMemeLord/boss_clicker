@@ -3,7 +3,7 @@ import Character from '../Character.js';
 
 class Knight extends Character {
     constructor(weapon = null) {
-        const defaultWeapon = weapon || new Sword('Rusty Sword', 'common', 1, 1, 'sword');
+        const defaultWeapon = weapon || new Sword('Rusty Sword', 'common', 1, 10, 'sword');
 
         super(
             'Knight',
@@ -13,7 +13,7 @@ class Knight extends Character {
                 atk: 12,
                 def: 18,
                 crit: 0.1,
-                lifeSteal: 0.02,
+                lifeSteal: 0.3,
                 skin: 'Knight_1',
             },
             defaultWeapon

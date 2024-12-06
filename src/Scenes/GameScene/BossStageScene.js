@@ -4,43 +4,68 @@ import elec2 from '../../assets/elc2.png';
 import Knight from "../../characters/classes/Knight";
 import Rogue from "../../characters/classes/Rogue";
 import Boss from "../../characters/bosses/Boss";
-import {generateRandomLoot} from "../../characters/loot/loot";
-import character from "../../characters/Character";
+import {generateRandomLoot, Sword} from "../../characters/loot/loot";
 
 class BossStageScene extends Phaser.Scene {
+    weaponImg = null;
     constructor() {
         super({key: 'BossStageScene'});
         this.boss = null; // Stocke l'instance actuelle du boss
 
+
     }
 
     init(data) {
-
         this.scene.stop('CharacterMenuScene');
         this.scene.stop('MainMenu');
 
         this.character = null;
         this.skin = null;
         this.number = null;
+
         if (data.character) {
-            console.log('Données du personnage hghgfhgf:', data.character);
+            console.log('Données du personnage reçues:', data.character);
+
             if (data.character.skin.includes('Knight')) {
                 this.character = new Knight();
-
             } else if (data.character.skin.includes('Elf')) {
                 this.character = new Rogue();
             }
-            Object.assign(this.character, data.character);
-            this.number = this.character.skin.match(/\d+/)[0];
+            let dataPerso = null;
+
+            try {
+                const storedData = sessionStorage.getItem(data.character.name);
+                if (storedData) {
+                    dataPerso = JSON.parse(storedData);
+                }
+
+            } catch (error) {
+                console.error('Erreur lors de la récupération des données du sessionStorage:', error);
+            }
+
+            if (dataPerso && data.character.name === dataPerso.name) {
+                Object.assign(this.character, dataPerso);
+            }
+
+            console.log('Données récupérées depuis sessionStorage:', dataPerso);
+            console.log('État final du personnage:', this.character);
+
+            this.number = this.character.skin.match(/\d+/)?.[0] || null;
             this.skin = this.character.skin.replace(`_${this.number}`, '');
+            this.weaponImg = this.character.weapon ? this.character.weapon.image : null;
         }
     }
 
+
     preload() {
         this.load.image('background3', require('../../assets/forest.png'));
+        this.load.image('sword', this.weaponImg);
         this.load.image('particle', elec2);
+
         console.log(this.skin);
         console.log(this.number);
+
+        // Charger les images de personnages
         if (this.character) {
             for (let i = 0; i <= 9; i++) {
                 this.load.image(
@@ -64,6 +89,8 @@ class BossStageScene extends Phaser.Scene {
                 );
             }
         }
+
+        // Charger les images des boss
         for (let bossId = 1; bossId <= 3; bossId++) {
             for (let i = 0; i <= 9; i++) {
                 this.load.image(
@@ -75,11 +102,24 @@ class BossStageScene extends Phaser.Scene {
                     `Boss${bossId}_dead_${i}`,
                     require(`../../assets/sprite_Boss/_PNG/${bossId}_TROLL/Troll_0${bossId}_1_DIE_00${i}.png`)
                 );
+
+                this.load.image(
+                    `Boss${bossId}_attack_${i}`,
+                    require(`../../assets/sprite_Boss/_PNG/${bossId}_TROLL/Troll_0${bossId}_1_ATTACK_00${i}.png`)
+                );
             }
         }
+        for (let i = 1; i <= 40; i++) {
+            const iconNumber = i.toString().padStart(2, '0');
 
-
+            this.load.image(
+                `Icon_32_${iconNumber}`,
+                `../../assets/swords/32 Free Weapon Icons/Icons/icon_32_${iconNumber}.png`
+            );
+            console.log(`icon_32_${iconNumber}`);
+        }
     }
+
 
     create() {
         const {width, height} = this.sys.game.config;
@@ -91,7 +131,7 @@ class BossStageScene extends Phaser.Scene {
         this.addBackButton();
         this.addBottomBar(width, height);
         this.addImagePlaceholder(width, height);
-        
+
 
         const totalNumbers = 10;
         const yPosition8 = (height / totalNumbers) * 8;
@@ -117,7 +157,7 @@ class BossStageScene extends Phaser.Scene {
             this.initializeInteraction(counter, particles, lineEmitter);
             this.checkGameOver(counter, particles, lineEmitter);
         }
-        this.spawnNewBoss();
+        this.spawnNewBoss(this.character);
 
 
         const baseY = height - 50 / 2;
@@ -237,20 +277,41 @@ class BossStageScene extends Phaser.Scene {
         const placeholderHeight = 100;
         const margin = 10;
 
+        // Créer un carré rouge
         const placeholder = this.add.graphics();
         placeholder.fillStyle(0xff0000, 1);
-        placeholder.fillRect(margin, height - placeholderHeight - margin - 50, placeholderWidth, placeholderHeight);
+        placeholder.fillRect(
+            margin,
+            height - placeholderHeight - margin - 50,
+            placeholderWidth,
+            placeholderHeight
+        );
+        this.character.weapon.name = 'icon_32_01.png'
+        sessionStorage.setItem(this.character.name, JSON.stringify(this.character));
+        // Vérifier si l'arme du personnage existe et a un nom valide
+        if (this.character && this.character.weapon && this.character.weapon.name) {
+            const weaponImageKey = this.character.weapon.name;
 
-        this.add.text(
-            margin + placeholderWidth / 2,
-            height - placeholderHeight / 2 - margin - 1 -50,
-            'Image',
-            {
-                fontSize: '16px',
-                fill: '#fff',
-                align: 'center',
-            }
-        ).setOrigin(0.5);
+            // Ajouter l'image de l'arme dans le carré
+            this.add.image(
+                margin + placeholderWidth / 2, // Centrer dans le carré
+                height - placeholderHeight / 2 - margin - 50,
+                'sword'
+                 // Nom de l'image préchargée dans `preload`
+            ).setDisplaySize(placeholderWidth, placeholderHeight); // Ajuster la taille de l'image
+        } else {
+            // Si aucune arme, afficher "Image" dans le carré
+            this.add.text(
+                margin + placeholderWidth / 2,
+                height - placeholderHeight / 2 - margin - 1 - 50,
+                'Image',
+                {
+                    fontSize: '16px',
+                    fill: '#fff',
+                    align: 'center',
+                }
+            ).setOrigin(0.5);
+        }
     }
 
 
@@ -352,26 +413,40 @@ class BossStageScene extends Phaser.Scene {
 
         // Fonction pour mettre à jour la barre de santé
         this.updateHealthBar = () => {
-            const healthPercentage = this.character.currentHp / maxHealth;
+            const healthPercentage = Math.min(Math.max(this.character.currentHp / maxHealth, 0), 1); // Contraindre entre 0 et 1
             this.healthBar.clear();
             this.healthBar.fillStyle(0x00ff00, 1);
             this.healthBar.fillRect(healthBarX, healthBarY, healthBarWidth * healthPercentage, healthBarHeight);
+
         };
+
     }
+
 
     showDamageText(x, y, damage, whoIsAttacking) {
         let dps;
+
         if (whoIsAttacking === this.character) {
-            console.log(this.character.stats.atk)
-            dps = this.character.stats.atk + this.character.weapon.damage;
+            const weaponDamage = this.character.weapon ? this.character.weapon.damage : 0;
+            dps = this.character.stats.atk + weaponDamage;
+        } else if (whoIsAttacking === this.boss) {
+            dps = this.boss.stats.atk || 0;
         } else {
-            dps = this.boss.stats.atk;
+            console.error("Attaquant inconnu. Impossible de calculer le DPS.");
+            dps = 0;
         }
 
         const isCritical = damage > dps;
+
         const textColor = isCritical ? '#ffcc00' : '#ff0000';
         const fontSize = isCritical ? '52px' : '42px';
         const text = isCritical ? `CRIT! -${damage}` : `-${damage}`;
+
+        if (!this.add) {
+            console.error("Le contexte de la scène est invalide. Impossible d'ajouter du texte.");
+            return;
+        }
+        console.log(text)
 
         const damageText = this.add.text(x, y, text, {
             fontSize: fontSize,
@@ -379,7 +454,6 @@ class BossStageScene extends Phaser.Scene {
             stroke: '#000000',
             strokeThickness: 2,
         }).setOrigin(0.5);
-
 
         const animationDuration = isCritical ? 1500 : 1000;
         const targetY = isCritical ? y - 70 : y - 50;
@@ -394,6 +468,37 @@ class BossStageScene extends Phaser.Scene {
         });
     }
 
+    showHealText(x, y, heal) {
+        const textColor = '#00ff00';
+        const fontSize = '42px';
+        const text = `+${heal}`;
+
+        if (!this.add) {
+            console.error("Le contexte de la scène est invalide. Impossible d'ajouter du texte.");
+            return;
+        }
+
+        const healText = this.add.text(x, y, text, {
+            fontSize: fontSize,
+            fill: textColor,
+            stroke: '#000000',
+            strokeThickness: 2,
+        }).setOrigin(0.5);
+
+        const animationDuration = 1000;
+        const targetY = y - 50;
+
+        this.tweens.add({
+            targets: healText,
+            y: targetY,
+            alpha: 0,
+            duration: animationDuration,
+            ease: 'Power1',
+            onComplete: () => healText.destroy(),
+        });
+
+    }
+
 
     initializeInteraction(counter, particles, lineEmitter) {
         if (this.character.currentHp > 0 && counter === 0) {
@@ -405,17 +510,16 @@ class BossStageScene extends Phaser.Scene {
 
     handlePointerDown(pointer, counter, particles, lineEmitter) {
         console.log(counter);
-
         if (counter === 0) {
             this.playAttackAnimation();
         }
-
-
         this.createParticleEffect(pointer, lineEmitter, particles);
-
     }
 
     playAttackAnimation() {
+        if (this.character.currentHp <= 0) {
+            return;
+        }
         this.characterSprite.play(`${this.skin}${this.number}_attack`);
         this.characterSprite.on('animationcomplete', (animation) => {
             if (animation.key === `${this.skin}${this.number}_attack`) {
@@ -454,17 +558,17 @@ class BossStageScene extends Phaser.Scene {
     checkGameOver(counter, particles, lineEmitter) {
         this.input.on('pointerdown', () => {
             if (this.character.currentHp <= 0 && counter === 0) {
+                particles.setVisible(false);
+                lineEmitter.stop();
                 counter++;
-                this.handleCharacterDeath(particles, lineEmitter);
+                this.handleCharacterDeath();
             }
 
         });
     }
 
-    handleCharacterDeath(particles, lineEmitter) {
+    handleCharacterDeath() {
         this.characterSprite.play(`${this.skin}${this.number}_dead`).once('animationcomplete', () => {
-            particles.setVisible(false);
-            lineEmitter.stop();
             this.showGameOverUI();
         });
     }
@@ -502,6 +606,7 @@ class BossStageScene extends Phaser.Scene {
             .setOrigin(0.5)
             .setInteractive({useHandCursor: true})
             .on('pointerdown', () => {
+                clearInterval(this.autoAttackInterval);
                 this.scene.restart();
             })
             .on('pointerover', () => {
@@ -540,9 +645,9 @@ class BossStageScene extends Phaser.Scene {
             });
     }
 
-    spawnNewBoss() {
-        // Détruit l'ancien boss s'il existe
+    spawnNewBoss(target) {
         if (this.bossSprite) {
+            clearInterval(this.autoAttackInterval);
             this.bossSprite.destroy();
         }
 
@@ -550,6 +655,7 @@ class BossStageScene extends Phaser.Scene {
         this.boss = new Boss();
         this.boss.id = bossId;
         this.setUpLevel();
+
 
         this.createBossAnimations(bossId);
 
@@ -566,18 +672,20 @@ class BossStageScene extends Phaser.Scene {
 
         this.createLvLindicator(this.bossSprite.x, this.bossSprite.y - 150, this.boss.level, 'boss');
 
-        // Crée la barre de vie du boss
         this.createBossHealthBar(this.boss.stats.hp, 400, 30, this.bossSprite.x - 200, this.bossSprite.y - 150);
 
-        // Ajoute l'interaction pour attaquer le boss
         this.bossSprite.setInteractive();
-        if (this.boss.currentHp > 0) {
+        if (this.boss.currentHp > 0 && target.currentHp > 0) {
             this.bossSprite.on('pointerdown', () => {
                 this.attackBoss();
             });
         }
 
+        if (target && target.isAlive()) {
+            this.chargeAttack(target);
+        }
     }
+
 
     createBossAnimations() {
         const bossFrames = Array.from({length: 10}, (_, i) => ({
@@ -612,6 +720,17 @@ class BossStageScene extends Phaser.Scene {
             frameRate: 20,
             repeat: 0,
         });
+
+        this.attackFrames = Array.from({length: 10}, (_, i) => ({
+            key: `Boss${this.boss.id}_attack_${i}`,
+        }));
+
+        this.anims.create({
+            key: `Boss${this.boss.id}_attack`,
+            frames: this.attackFrames,
+            frameRate: 20,
+            repeat: 0,
+        })
     }
 
     createBossHealthBar(maxHp, width, height, x, y) {
@@ -642,11 +761,50 @@ class BossStageScene extends Phaser.Scene {
         this.updateBossHealthBar();
     }
 
+    chargeAttack(target) {
+        const interval = 10000 / this.boss.speed;
+
+        this.autoAttackInterval = setInterval(() => {
+            // Vérifie si la scène ou les sprites sont encore valides
+            if (!this.bossSprite || !this.bossSprite.scene || !target || !target.isAlive()) {
+                clearInterval(this.autoAttackInterval);
+                this.autoAttackInterval = null;
+                console.log("Attaque automatique arrêtée : scène ou sprites invalides.");
+                return;
+            }
+
+            if (target.isAlive()) {
+                this.bossSprite.play(`Boss${this.boss.id}_attack`).once('animationcomplete', () => {
+                    if (this.bossSprite) {
+                        this.bossSprite.play(`Boss${this.boss.id}_idle`);
+                    }
+                });
+
+                const dps = this.boss.attackEnemy(target);
+                this.updateHealthBar();
+                this.showDamageText(this.characterSprite.x, this.characterSprite.y - 100, dps, this.boss);
+
+                if (target.currentHp <= 0) {
+                    this.handleCharacterDeath();
+                }
+            } else {
+                clearInterval(this.autoAttackInterval);
+                this.autoAttackInterval = null;
+                console.log("Attaque automatique arrêtée. Soit le boss, soit la cible est mort.");
+            }
+        }, interval);
+    }
+
+
 
     attackBoss() {
         if (this.boss.currentHp <= 0) {
             return;
         }
+        if (this.character.currentHp <= 0) {
+            return;
+        }
+        const currentHp  = this.character.currentHp;
         const damage = this.character.attackEnemy(this.boss);
         this.boss.currentHp -= damage;
 
@@ -659,12 +817,17 @@ class BossStageScene extends Phaser.Scene {
 
         this.updateBossHealthBar();
         this.showDamageText(this.bossSprite.x, this.bossSprite.y - 100, damage, this.character);
+        if (currentHp < this.character.currentHp) {
+            this.showHealText(this.characterSprite.x, this.characterSprite.y - 100, this.character.currentHp - currentHp);
+            this.updateHealthBar()
+        }
+
 
         if (this.boss.currentHp <= 0) {
             this.bossSprite.play(`Boss${this.boss.id}_dead`).once('animationcomplete', () => {
                 this.giveExpToCharacter();
                 this.generateLoot();
-                this.spawnNewBoss();
+                this.spawnNewBoss(this.character);
             });
         }
     }
@@ -674,27 +837,35 @@ class BossStageScene extends Phaser.Scene {
         const coin = loot[0];
         const iteam = loot[1];
         console.log(this.character);
-        if ( this.character.skin.includes('Knight')) {
-            console.log('Knight');
-        }
-        if ( this.character.skin.includes('Elf')) {
-            console.log('Rogue');
-        }
+        if (this.character.skin.includes('Knight')) {
+            if (iteam.type === "sword") {
+                if (this.character.weapon.damage < iteam.damage) {
+                    this.character.changeWeapon(iteam)
+                }
+            }
+            if (this.character.skin.includes('Elf')) {
+                console.log('Rogue');
+            }
 
+        }
     }
 
     giveExpToCharacter() {
+        const currentLevel = this.character.level;
         const exp = this.boss.expDrop;
-        this.character.gainExp(exp);
+        this.character.gainExp(exp, 'character');
+        if (currentLevel < this.character.level) {
+            this.updateBossHealthBar();
+        }
         this.createLvLindicator(this.characterSprite.x, this.characterSprite.y - 150, this.character.level, 'character');
     }
 
-    setUpLevel(){
+    setUpLevel() {
         const levelDifference = Phaser.Math.Between(0, 2);
         console.log('levelDifference:', levelDifference);
         const nmbLevels = this.character.level + levelDifference;
         console.log('nmbLevels:', nmbLevels);
-        this.boss.setLevel(nmbLevels);
+        this.boss.setLevel(nmbLevels, 'boss');
         this.boss.calculateExpDrop(this.boss.level)
         console.log('this.boss.level:', this.boss);
     }

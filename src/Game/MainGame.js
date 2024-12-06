@@ -21,7 +21,7 @@ const MainGame = () => {
         console.log('Données du personnage :', characterData);
 
         const config = {
-            type: Phaser.WEBGL,
+            type: Phaser.AUTO,
             width: window.innerWidth,
             height: window.innerHeight,
             parent: 'phaser-container',

@@ -19,15 +19,18 @@ class Character {
     }
 
     attackEnemy(enemy) {
-        if (!this.weapon) {
-            console.error('Aucune arme équipée. Impossible d’attaquer.');
+        if (!enemy || !enemy.isAlive()) {
+            console.log(`${enemy ? enemy.name : 'Cible'} n'est pas valide ou est déjà mort.`);
             return 0;
         }
 
-        const isCrit =
-            Math.random() < this.stats.crit || Math.random() < this.weapon.crit;
+        // Vérifie si l'arme existe et utilise des valeurs par défaut sinon
+        const weaponCrit = this.weapon ? this.weapon.crit : 0;
+        const weaponDamage = this.weapon ? this.weapon.damage : 0;
 
-        const baseDamage = this.stats.atk + this.weapon.damage;
+        const isCrit = Math.random() < this.stats.crit || Math.random() < weaponCrit;
+
+        const baseDamage = this.stats.atk + weaponDamage;
         const damage = isCrit ? baseDamage * 2 : baseDamage;
 
         const finalDamage = Math.max(damage - enemy.stats.def, 0);
@@ -39,9 +42,11 @@ class Character {
             console.log(`${enemy.name} est vaincu !`);
         }
 
+        // Gestion du vol de vie
         const isLifeSteal = Math.random() < this.stats.lifeSteal;
         const lifeStealAmount = isLifeSteal ? finalDamage * this.stats.lifeSteal : 0;
-        this.currentHp = Math.min(this.currentHp + lifeStealAmount, this.stats.hp);
+        this.currentHp = Math.min(Math.floor(this.currentHp + lifeStealAmount), this.stats.hp);
+
 
         console.log(
             `${this.name} attaque ${enemy.name} pour ${finalDamage} dégâts ${
@@ -54,49 +59,73 @@ class Character {
 
 
 
+
     changeWeapon(newWeapon) {
         this.weapon = newWeapon;
+        sessionStorage.setItem(this.name, JSON.stringify(this));
         console.log(`${this.name} a équipé une nouvelle arme : ${newWeapon.name}`);
     }
 
 
-    gainExp(amount) {
+    gainExp(amount, type = "character") {
         this.exp += amount;
         console.log(`${this.name} gagne ${amount} EXP.`);
 
         while (this.exp >= this.getExpToLevelUp()) {
-            this.levelUp();
+            this.levelUp(type);
         }
         console.log(`${this.name} EXP: ${this.exp}/${this.getExpToLevelUp()}`);
     }
 
-    levelUp() {
+    levelUp(type) {
         this.exp -= this.getExpToLevelUp();
         this.level += 1;
 
         console.log(`${this.name} monte au niveau ${this.level}!`);
+        if(type === "character"){
+            this.stats.hp += 15;
+            this.stats.atk += 3;
+            this.stats.def += 1;
+            this.stats.crit = Math.min(this.stats.crit + 0.005, 1);
+            this.stats.lifeSteal = Math.min(this.stats.lifeSteal + 0.01, 1);
+            this.currentHp = this.stats.hp;
+            sessionStorage.setItem(this.name, JSON.stringify(this));
+            localStorage.setItem(this.name, JSON.stringify(this));
+        }
+        else if (type ==="boss"){
+            this.stats.hp += 200;
+            this.stats.atk += 10;
+            this.stats.def += 5;
+            this.stats.crit = Math.min(this.stats.crit + 0.00, 1);
+            this.stats.lifeSteal = Math.min(this.stats.lifeSteal + 0.00, 1);
+            this.currentHp = this.stats.hp;
+        }
 
-        this.stats.hp += 10;
-        this.stats.atk += 2;
-        this.stats.def += 2;
-        this.stats.crit = Math.min(this.stats.crit + 0.01, 1);
-        this.stats.lifeSteal = Math.min(this.stats.lifeSteal + 0.01, 1);
-        this.currentHp = this.stats.hp;
-        sessionStorage.setItem(this.name, JSON.stringify(this));
-        localStorage.setItem(this.name, JSON.stringify(this));
     }
 
-    setLevel(level) {
+    setLevel(level, type = "character") {
         this.level = level;
         this.exp = 0;
-        this.stats.hp += 10 * level;
-        this.stats.atk += 2 * level;
-        this.stats.def += 2 * level;
-        this.stats.crit = Math.min(this.stats.crit + 0.01 * level, 1);
-        this.stats.lifeSteal = Math.min(this.stats.lifeSteal + 0.01 * level, 1);
+
+        if (type === "character") {
+            this.stats.hp += 10 * (level - 1);
+            this.stats.atk += 2 * (level - 1);
+            this.stats.def += 2 * (level - 1);
+            this.stats.crit = Math.min(this.stats.crit + 0.01 * (level - 1), 1);
+            this.stats.lifeSteal = Math.min(this.stats.lifeSteal + 0.01 * (level - 1), 1);
+        } else if (type === "boss") {
+            this.stats.hp += 200 * (level - 1);
+            this.stats.atk += 10 * (level - 1);
+            this.stats.def += 4 * (level - 1);
+            this.stats.crit = Math.min(this.stats.crit + 0.01 * (level - 1), 1);
+            this.stats.lifeSteal = Math.min(this.stats.lifeSteal + 0.01 * (level - 1), 1);
+        }
+
         this.currentHp = this.stats.hp;
 
+        console.log(`${this.name} a été mis à niveau vers le niveau ${this.level} (${type}).`);
     }
+
 
     getExpToLevelUp() {
         return this.level * 100;
