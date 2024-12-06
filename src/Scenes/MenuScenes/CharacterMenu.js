@@ -4,7 +4,6 @@ import Rogue from "../../characters/classes/Rogue";
 import fireSpark from '../../assets/sprite/flame2.png';
 import cursor from '../../assets/sprite/Normal.cur';
 import swordLogo from '../../assets/sword_logo.png';
-import {Bow, Sword} from "../../characters/loot/loot";
 
 class CharacterMenuScene extends Phaser.Scene {
     constructor() {
@@ -33,9 +32,8 @@ class CharacterMenuScene extends Phaser.Scene {
                 this.load.image(`Elf_${skin}_idle_${i}`, require(`../../assets/sprite/_PNG/${skin}_ELF/Elf_0${skin}__IDLE_00${i}.png`));
             }
         }
-        // this.load.image('spark', sparkBleu);
+
         this.load.image('fire', fireSpark);
-        // this.load.image('background', background2);
         this.load.image('sword_logo', swordLogo);
     }
 
@@ -248,7 +246,7 @@ class CharacterMenuScene extends Phaser.Scene {
 
         const elfCharacter = this.characters.find((char) => char.name === 'Elf')
 
-        elfCharacter.skin = `Elf_${this.currentElfSkin}`; // Met à jour le skin du personnage
+        elfCharacter.skin = `Elf_${this.currentElfSkin}`;
 
         this.selectCharacter(elfCharacter, elfCharacter.card);
     }

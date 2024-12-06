@@ -421,8 +421,6 @@ class BossStageScene extends Phaser.Scene {
             console.error("Attaquant inconnu. Impossible de calculer le DPS.");
             dps = 0;
         }
-
-        // Arrondir la valeur des dégâts
         const roundedDamage = Math.round(damage);
 
         const isCritical = roundedDamage > dps;
@@ -884,7 +882,7 @@ class BossStageScene extends Phaser.Scene {
         console.log(`Boost d'attaque appliqué : +${attackBoost} (Effect: ${item.effectValue}%)`);
         this.character.weapon.damage += attackBoost;
 
-        const textX = 220; 
+        const textX = 220;
         const textY = 300;
 
         const timeRemainingText = this.add.text(textX, textY, `Boost atk: ${item.duration}s (+${item.effectValue}% dps gain)`, {

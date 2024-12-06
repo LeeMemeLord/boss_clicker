@@ -29,12 +29,6 @@ class Boss extends Character {
         console.log("expDrop", this.expDrop);
     }
 
-    setSpeedByLevel(level) {
-        if (this.speed === 10) {
-            this.speed = 1;
-        }
-        this.speed = level;
-    }
 
 }
 export default Boss;

@@ -34,7 +34,6 @@ class Character {
             return 0;
         }
 
-        // Vérifie si l'arme existe et utilise des valeurs par défaut sinon
         const weaponCrit = this.weapon ? this.weapon.crit : 0;
         const weaponDamage = this.weapon ? this.weapon.damage : 0;
 
@@ -52,7 +51,7 @@ class Character {
             console.log(`${enemy.name} est vaincu !`);
         }
 
-        // Gestion du vol de vie
+
         const isLifeSteal = Math.random() < this.stats.lifeSteal;
         const lifeStealAmount = isLifeSteal ? finalDamage * this.stats.lifeSteal : 0;
         this.currentHp = Math.min(Math.floor(this.currentHp + lifeStealAmount), this.stats.hp);

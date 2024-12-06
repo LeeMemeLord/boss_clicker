@@ -19,7 +19,7 @@ class Knight extends Character {
             defaultWeapon
         );
 
-        // Vérification pour s'assurer que l'arme est une épée
+
         if (defaultWeapon.type !== 'sword') {
             throw new Error('Les Knights ne peuvent utiliser que des épées.');
         }

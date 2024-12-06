@@ -24,7 +24,7 @@ export class Sword extends Weapon {
                 value = 1,
                 damage = 1,
                 type = 'sword',
-                levelMultiplier) // Niveau du personnage
+                levelMultiplier)
     {
 
         if (levelMultiplier) {
@@ -34,10 +34,10 @@ export class Sword extends Weapon {
             const adjustedDamage = randomDamage(levelMultiplier, generatedRarity);
 
             super(
-                name, // Utiliser le nom du fichier comme nom de l'épée
+                name,
                 generatedRarity,
-                adjustedValue, // Ajuste la valeur
-                adjustedDamage, // Ajuste les dégâts
+                adjustedValue,
+                adjustedDamage,
                 'sword'
             );
 
@@ -49,7 +49,7 @@ export class Sword extends Weapon {
 }
 
 function generateName() {
-    // utiliser s1 a s11
+
     const swordNames = ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', 's10'];
 
     return swordNames[Math.floor(Math.random() * swordNames.length)];
@@ -64,7 +64,7 @@ export class Bow extends Weapon {
                 value = 1,
                 damage = 1,
                 type = 'bow',
-                levelMultiplier) // Niveau du personnage
+                levelMultiplier)
     {
         if (levelMultiplier) {
             const name = generateBowName();
@@ -73,11 +73,11 @@ export class Bow extends Weapon {
             const adjustedDamage = randomDamage(levelMultiplier, generatedRarity);
 
             super(
-                name, // Nom généré pour l'arc
-                generatedRarity, // Rareté générée
-                adjustedValue, // Valeur ajustée
-                adjustedDamage, // Dégâts ajustés
-                'bow' // Type d'arme
+                name,
+                generatedRarity,
+                adjustedValue,
+                adjustedDamage,
+                'bow'
             );
         } else {
             super(name, rarity, value, damage, type);
@@ -157,7 +157,7 @@ function randomValue(min, max, rarity) {
         legendary: 5,
     };
 
-    const multiplier = rarityMultiplier[rarity] || 1; // Par défaut, multiplier = 1 si la rareté est inconnue
+    const multiplier = rarityMultiplier[rarity] || 1;
     return Math.floor((Math.random() * (max - min + 1) + min) * multiplier);
 
 }
@@ -180,12 +180,12 @@ function randomDamage(level, rarity) {
 export function generateRandomLoot(levelMultiplier = 1) {
     const lootTypes = [Sword, Bow, Boost, Coin];
 
-    const loot = [new Coin()]; // Toujours ajouter un Coin
+    const loot = [new Coin()];
 
     const LootClass = lootTypes[Math.floor(Math.random() * lootTypes.length)];
 
     if (LootClass === Sword || LootClass === Bow) {
-        loot.push(new LootClass(null, null, null, null, null, levelMultiplier)); // Passe le niveau
+        loot.push(new LootClass(null, null, null, null, null, levelMultiplier));
     } else {
         loot.push(new LootClass());
     }
