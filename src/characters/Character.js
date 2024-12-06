@@ -16,6 +16,16 @@ class Character {
         };
         this.weapon = weapon;
         this.currentHp = this.stats.hp;
+        this.coins = 0;
+        this.attackBoost = null;
+        this.expBoost = null;
+        this.attackBoostActive = false;
+        this.expBoostActive = false;
+    }
+
+    gainGold(amount) {
+        this.coins += amount;
+        console.log(`${this.name} a gagné ${amount} pièces d'or.`);
     }
 
     attackEnemy(enemy) {

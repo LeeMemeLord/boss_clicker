@@ -4,13 +4,22 @@ import Knight from "../../characters/classes/Knight";
 import Rogue from "../../characters/classes/Rogue";
 import Boss from "../../characters/bosses/Boss";
 import {generateRandomLoot} from "../../characters/loot/loot";
-
+import s1 from "../../assets/swords/s/s1.png"
+import s2 from "../../assets/swords/s/s2.png"
+import s3 from "../../assets/swords/s/s3.png"
+import s4 from "../../assets/swords/s/s4.png"
+import s5 from "../../assets/swords/s/s5.png"
+import s6 from "../../assets/swords/s/s6.png"
+import s7 from "../../assets/swords/s/s7.png"
+import s8 from "../../assets/swords/s/s8.png"
+import s9 from "../../assets/swords/s/s9.png"
+import s10 from "../../assets/swords/s/s10.png"
+import s11 from "../../assets/swords/s/s11.png"
 class BossStageScene extends Phaser.Scene {
     constructor() {
         super({key: 'BossStageScene'});
-        this.boss = null;
+        this.boss = null; 
     }
-
     init(data) {
         this.scene.stop('CharacterMenuScene');
         this.scene.stop('MainMenu');
@@ -40,22 +49,22 @@ class BossStageScene extends Phaser.Scene {
             console.log('État final du personnage:', this.character);
             this.number = this.character.skin.match(/\d+/)?.[0] || null;
             this.skin = this.character.skin.replace(`_${this.number}`, '');
-            this.character.attackBoost = null;
-            this.character.attackBoostActive = false;
-            this.character.expBoost = null;
-            this.character.expBoostActive = false;
         }
     }
-
     preload() {
         this.load.image('background3', require('../../assets/forest.png'));
         this.load.image('particle', elec2);
-
-        for (let i = 1 ; i <11; i++ ){
-            this.load.image(`s${i}`, require(`../../assets/swords/s/s${i}.png`));
-            this.load.image(`b${i}`, require(`../../assets/bows/b/b${i}.png`));
-        }
-
+        this.load.image("s1", s1);
+        this.load.image("s2", s2);
+        this.load.image("s3", s3);
+        this.load.image("s4", s4);
+        this.load.image("s5", s5);
+        this.load.image("s6", s6);
+        this.load.image("s7", s7);
+        this.load.image("s8", s8);
+        this.load.image("s9", s9);
+        this.load.image("s10", s10);
+        this.load.image("s11", s11);
         for (let i = 1; i <= 30; i++) {
             if (i === 6 || i === 16 || i === 26) {
                 continue;
@@ -99,7 +108,6 @@ class BossStageScene extends Phaser.Scene {
             }
         }
     }
-
     create() {
         const {width, height} = this.sys.game.config;
         let counter = 0;
@@ -160,11 +168,9 @@ class BossStageScene extends Phaser.Scene {
             },
         });
     }
-
     addBackground(width, height) {
         this.add.image(width / 2, height / 2, 'background3').setDisplaySize(width, height);
     }
-
     addTitle(width) {
         const title = this.add.text(width / 2, 50, 'CLICK THE TROLL', {
             fontSize: '48px',
@@ -175,31 +181,30 @@ class BossStageScene extends Phaser.Scene {
         }).setOrigin(0.5);
         this.tweens.add({
             targets: title,
-            y: 70,
-            duration: 1000,
-            ease: 'Bounce.easeOut',
-            yoyo: true,
-            repeat: -1,
+            y: 70, 
+            duration: 1000, 
+            ease: 'Bounce.easeOut', 
+            yoyo: true, 
+            repeat: -1, 
         });
         let colorToggle = false;
         this.time.addEvent({
-            delay: 500,
+            delay: 500, 
             callback: () => {
-                title.setFill(colorToggle ? '#ffcc00' : '#ffffff');
+                title.setFill(colorToggle ? '#ffcc00' : '#ffffff'); 
                 colorToggle = !colorToggle;
             },
             loop: true,
         });
         this.tweens.add({
             targets: title,
-            scale: 1.2,
+            scale: 1.2, 
             duration: 1500,
             ease: 'Sine.easeInOut',
-            yoyo: true,
+            yoyo: true, 
             repeat: -1,
         });
     }
-
     addBackButton() {
         console.log('addBackButton called');
         const backButton = this.add.text(10, 10, 'Retour', {
@@ -223,25 +228,23 @@ class BossStageScene extends Phaser.Scene {
             });
         backButton.setOrigin(0, 0);
     }
-
     addBottomBar(width, height) {
         const barHeight = 50;
         const graphics = this.add.graphics();
         graphics.fillStyle(0x000000, 1);
         graphics.fillRect(0, height - barHeight, width, barHeight);
     }
-
     addOrReplacePlaceholder(width, height) {
         const placeholderWidth = 100;
         const placeholderHeight = 100;
         const margin = 10;
         const rarityColors = {
-            common: 0xaaaaaa,
-            rare: 0x0000ff,
-            epic: 0x800080,
-            legendary: 0xffd700,
+            common: 0xaaaaaa, 
+            rare: 0x0000ff,  
+            epic: 0x800080,  
+            legendary: 0xffd700, 
         };
-        let rarityColor = 0xff0000;
+        let rarityColor = 0xff0000; 
         if (this.character && this.character.weapon && this.character.weapon.rarity) {
             const rarity = this.character.weapon.rarity.toLowerCase();
             rarityColor = rarityColors[rarity] || rarityColor;
@@ -267,7 +270,6 @@ class BossStageScene extends Phaser.Scene {
             weapomName
         ).setDisplaySize(placeholderWidth * 0.8, placeholderHeight * 0.8).setOrigin(0.5);
     }
-
     addCoin() {
         this.anims.create({
             key: 'goldSpin',
@@ -299,14 +301,12 @@ class BossStageScene extends Phaser.Scene {
             sessionStorage.setItem(this.character.name, JSON.stringify(this.character));
         };
     }
-
     createAnimations() {
         this.createIdleAnimation();
         this.createAttackAnimation();
         this.createHurtAnimation();
         this.createDeadAnimation();
     }
-
     createIdleAnimation() {
         const idleFrames = Array.from({length: 10}, (_, i) => ({
             key: `${this.skin}${this.number}_idle_${i}`,
@@ -318,7 +318,6 @@ class BossStageScene extends Phaser.Scene {
             repeat: -1,
         });
     }
-
     createAttackAnimation() {
         const attackFrames = Array.from({length: 10}, (_, i) => ({
             key: `${this.skin}${this.number}_attack_${i}`,
@@ -330,7 +329,6 @@ class BossStageScene extends Phaser.Scene {
             repeat: 0,
         });
     }
-
     createHurtAnimation() {
         const hurtFrames = Array.from({length: 10}, (_, i) => ({
             key: `${this.skin}${this.number}_hurt_${i}`,
@@ -342,7 +340,6 @@ class BossStageScene extends Phaser.Scene {
             repeat: 0,
         });
     }
-
     createDeadAnimation() {
         const deadFrames = Array.from({length: 10}, (_, i) => ({
             key: `${this.skin}${this.number}_dead_${i}`,
@@ -354,7 +351,6 @@ class BossStageScene extends Phaser.Scene {
             repeat: 0,
         });
     }
-
     initializeCharacterSprite(yPosition8) {
         if (this.characterSprite) {
             this.characterSprite.destroy();
@@ -369,7 +365,6 @@ class BossStageScene extends Phaser.Scene {
             .setOrigin(0.5);
         this.createLvLindicator(this.characterSprite.x, this.characterSprite.y - 150, this.character.level, 'character')
     }
-
     createHealthBar() {
         const maxHealth = this.character.stats.hp;
         const healthBarWidth = 200;
@@ -389,12 +384,11 @@ class BossStageScene extends Phaser.Scene {
             this.healthBar.fillRect(healthBarX, healthBarY, healthBarWidth * healthPercentage, healthBarHeight);
         };
     }
-
     createExpBar() {
         const expBarWidth = 200;
         const expBarHeight = 10;
         const expBarX = this.characterSprite.x - expBarWidth / 2;
-        const expBarY = this.characterSprite.y + 70;
+        const expBarY = this.characterSprite.y + 70; 
         this.expBarBackground = this.add.graphics();
         this.expBarBackground.fillStyle(0x444444, 1);
         this.expBarBackground.fillRect(expBarX, expBarY, expBarWidth, expBarHeight);
@@ -402,16 +396,14 @@ class BossStageScene extends Phaser.Scene {
         this.expBar.fillStyle(0x0000ff, 1);
         this.expBar.fillRect(expBarX, expBarY, expBarWidth * this.character.exp / this.character.getExpToLevelUp(), expBarHeight);
         this.updateExpBar = () => {
-            const expPercentage = Math.min(this.character.exp / this.character.getExpToLevelUp(), 1);
+            const expPercentage = Math.min(this.character.exp / this.character.getExpToLevelUp(), 1); 
             this.expBar.clear();
             this.expBar.fillStyle(0x0000ff, 1);
             this.expBar.fillRect(expBarX, expBarY, expBarWidth * expPercentage, expBarHeight);
         };
     }
-
     showDamageText(x, y, damage, whoIsAttacking) {
         let dps;
-
         if (whoIsAttacking === this.character) {
             const weaponDamage = this.character.weapon ? this.character.weapon.damage : 0;
             dps = this.character.stats.atk + weaponDamage;
@@ -421,32 +413,23 @@ class BossStageScene extends Phaser.Scene {
             console.error("Attaquant inconnu. Impossible de calculer le DPS.");
             dps = 0;
         }
-
-        // Arrondir la valeur des dégâts
-        const roundedDamage = Math.round(damage);
-
-        const isCritical = roundedDamage > dps;
+        const isCritical = damage > dps;
         const textColor = isCritical ? '#ffcc00' : '#ff0000';
         const fontSize = isCritical ? '52px' : '42px';
-        const text = isCritical ? `CRIT! -${roundedDamage}` : `-${roundedDamage}`;
-
+        const text = isCritical ? `CRIT! -${damage}` : `-${damage}`;
         if (!this.add) {
             console.error("Le contexte de la scène est invalide. Impossible d'ajouter du texte.");
             return;
         }
-
-        console.log(text);
-
+        console.log(text)
         const damageText = this.add.text(x, y, text, {
             fontSize: fontSize,
             fill: textColor,
             stroke: '#000000',
             strokeThickness: 2,
         }).setOrigin(0.5);
-
         const animationDuration = isCritical ? 1500 : 1000;
         const targetY = isCritical ? y - 70 : y - 50;
-
         this.tweens.add({
             targets: damageText,
             y: targetY,
@@ -456,8 +439,6 @@ class BossStageScene extends Phaser.Scene {
             onComplete: () => damageText.destroy(),
         });
     }
-
-
     showHealText(x, y, heal) {
         const textColor = '#00ff00';
         const fontSize = '42px';
@@ -483,7 +464,6 @@ class BossStageScene extends Phaser.Scene {
             onComplete: () => healText.destroy(),
         });
     }
-
     initializeInteraction(counter, particles, lineEmitter) {
         if (this.character.currentHp > 0 && counter === 0) {
             this.input.on('pointerdown', (pointer) => {
@@ -491,14 +471,13 @@ class BossStageScene extends Phaser.Scene {
             });
         }
     }
-
     handlePointerDown(pointer, counter, particles, lineEmitter) {
+        console.log(counter);
         if (counter === 0) {
             this.playAttackAnimation();
         }
         this.createParticleEffect(pointer, lineEmitter, particles);
     }
-
     playAttackAnimation() {
         if (this.character.currentHp <= 0) {
             return;
@@ -510,7 +489,6 @@ class BossStageScene extends Phaser.Scene {
             }
         });
     }
-
     createParticleEffect(pointer, lineEmitter, particles) {
         const emitter = particles.createEmitter({
             x: pointer.x,
@@ -534,7 +512,6 @@ class BossStageScene extends Phaser.Scene {
             lineEmitter.stop();
         });
     }
-
     checkGameOver(counter, particles, lineEmitter) {
         this.input.on('pointerdown', () => {
             if (this.character.currentHp <= 0 && counter === 0) {
@@ -545,13 +522,11 @@ class BossStageScene extends Phaser.Scene {
             }
         });
     }
-
     handleCharacterDeath() {
         this.characterSprite.play(`${this.skin}${this.number}_dead`).once('animationcomplete', () => {
             this.showGameOverUI();
         });
     }
-
     showGameOverUI() {
         const gameOverText = this.add.text(
             this.cameras.main.centerX,
@@ -567,7 +542,6 @@ class BossStageScene extends Phaser.Scene {
         this.createRetryButton();
         this.createBackButton();
     }
-
     createRetryButton() {
         const retryButton = this.add.text(
             this.cameras.main.centerX,
@@ -594,7 +568,6 @@ class BossStageScene extends Phaser.Scene {
                 retryButton.setStyle({fill: '#fff'});
             });
     }
-
     createBackButton() {
         const backButton = this.add.text(
             this.cameras.main.centerX,
@@ -622,7 +595,6 @@ class BossStageScene extends Phaser.Scene {
                 backButton.setStyle({fill: '#fff'});
             });
     }
-
     spawnNewBoss(target) {
         if (this.bossSprite) {
             clearInterval(this.autoAttackInterval);
@@ -654,7 +626,6 @@ class BossStageScene extends Phaser.Scene {
             this.chargeAttack(target);
         }
     }
-
     createBossAnimations() {
         const bossFrames = Array.from({length: 10}, (_, i) => ({
             key: `Boss${this.boss.id}_idle_${i}`,
@@ -693,7 +664,6 @@ class BossStageScene extends Phaser.Scene {
             repeat: 0,
         })
     }
-
     createBossHealthBar(maxHp, width, height, x, y) {
         if (this.bossHealthBarBackground) {
             this.bossHealthBarBackground.destroy();
@@ -716,7 +686,6 @@ class BossStageScene extends Phaser.Scene {
         };
         this.updateBossHealthBar();
     }
-
     chargeAttack(target) {
         const interval = 10000 / this.boss.speed;
         this.autoAttackInterval = setInterval(() => {
@@ -745,7 +714,6 @@ class BossStageScene extends Phaser.Scene {
             }
         }, interval);
     }
-
     attackBoss() {
         if (this.boss.currentHp <= 0) {
             return;
@@ -774,15 +742,14 @@ class BossStageScene extends Phaser.Scene {
             });
         }
     }
-
     generateLoot() {
         const loot = generateRandomLoot(this.character.level);
         console.log('Loot généré:', loot);
-        const coin = loot[0]?.value || 0;
+        const coin = loot[0]?.value || 0; 
         if (coin > 0) {
-            this.character.gainGold(coin);
+            this.character.gainGold(coin); 
             console.log(`Coins gagnés: ${coin}`);
-            this.updateCoinText();
+            this.updateCoinText(); 
         }
         const item = loot[1];
         if (item) {
@@ -794,44 +761,27 @@ class BossStageScene extends Phaser.Scene {
                 if (this.character.weapon.damage < item.damage) {
                     this.character.changeWeapon(item);
                     console.log('Nouvelle épée équipée:', item);
-                    this.addOrReplacePlaceholder(this.scale.width, this.scale.height);
+                    this.addOrReplacePlaceholder(this.scale.width, this.scale.height); 
                 }
-            } else if (this.character.skin.includes("Elf") && item.type === "bow") {
-                if (this.character.weapon.damage < item.damage) {
-                    this.character.changeWeapon(item);
-                    console.log('Nouvel arc équipé:', item);
-                    this.addOrReplacePlaceholder(this.scale.width, this.scale.height);
-                }
-            }
-            else if(item.name === "Boost"){
-                if(item.effect === "experience"){
-                    this.character.expBoost = item
-                    this.addExpBoost(item);
-                }
-                else if (item.effect === "attack"){
-                    console.log('Boost d\'attaque:', item);
-                    this.addAttackBoost(item);
-                }
-            }
-            else {
+            } else if (this.character.skin.includes("Elf")) {
+                console.log('Loot pour Rogue:', item);
+            } else {
                 console.log('Loot non applicable pour ce personnage:', item);
             }
         } else {
             console.log('Aucun item supplémentaire dans le loot.');
         }
     }
-
     giveExpToCharacter() {
         const currentLevel = this.character.level;
-        const exp = this.boss.expDrop + this.character.expBoost?.effectValue || 0;
+        const exp = this.boss.expDrop;
         this.character.gainExp(exp, 'character');
-        this.updateExpBar();
+        this.updateExpBar(); 
         if (currentLevel < this.character.level) {
             this.updateBossHealthBar();
         }
         this.createLvLindicator(this.characterSprite.x, this.characterSprite.y - 150, this.character.level, 'character');
     }
-
     setUpLevel() {
         const levelDifference = Phaser.Math.Between(0, 2);
         console.log('levelDifference:', levelDifference);
@@ -841,7 +791,6 @@ class BossStageScene extends Phaser.Scene {
         this.boss.calculateExpDrop(this.boss.level)
         console.log('this.boss.level:', this.boss);
     }
-
     createLvLindicator(x, y, level, whoIsCalling) {
         let levelIndicatorKey;
         if (whoIsCalling === 'character') {
@@ -870,100 +819,5 @@ class BossStageScene extends Phaser.Scene {
             repeat: -1,
         });
     }
-
-    addAttackBoost(item) {
-        if (this.character.attackBoostActive) {
-            console.log('Un boost d\'attaque est déjà actif.');
-            return;
-        }
-
-        this.character.attackBoostActive = true;
-        this.character.attackBoost = item;
-
-        const attackBoost = this.character.weapon.damage * (item.effectValue / 100);
-        console.log(`Boost d'attaque appliqué : +${attackBoost} (Effect: ${item.effectValue}%)`);
-        this.character.weapon.damage += attackBoost;
-
-        const textX = 220; 
-        const textY = 300;
-
-        const timeRemainingText = this.add.text(textX, textY, `Boost atk: ${item.duration}s (+${item.effectValue}% dps gain)`, {
-            fontSize: '24px',
-            fill: '#FFD700',
-            stroke: '#000000',
-            strokeThickness: 2,
-        }).setOrigin(0.5);
-
-        let remainingTime = item.duration;
-        const timerEvent = this.time.addEvent({
-            delay: 1000,
-            callback: () => {
-                remainingTime--;
-                timeRemainingText.setText(`Boost atk: ${remainingTime}s (+${item.effectValue}% dps gain)`);
-
-                if (remainingTime <= 0) {
-                    timeRemainingText.destroy();
-                }
-            },
-            repeat: item.duration - 1,
-        });
-
-        this.time.delayedCall(item.duration * 1000, () => {
-            this.character.weapon.damage -= attackBoost;
-            this.character.attackBoostActive = false;
-            this.character.attackBoost = null;
-            console.log(`Boost d'attaque terminé. L'attaque est revenue à : ${this.character.stats.atk}`);
-        });
-    }
-
-    addExpBoost(item) {
-        console.log(item + " Exp Boost appliqué");
-
-        if (this.character.expBoostActive) {
-            console.log('Un boost d\'expérience est déjà actif.');
-            return;
-        }
-
-        this.character.expBoostActive = true;
-        this.character.expBoost = item;
-
-        const expBoost = this.character.exp * (item.effectValue / 100);
-        console.log(`Boost d'expérience appliqué : +${expBoost} (Effect: ${item.effectValue}%)`);
-
-        const textX = 220;
-        const textY = 330;
-
-        const expBoostText = this.add.text(textX, textY, `Boost exp: ${item.duration}s (+${item.effectValue}% exp gain)`, {
-            fontSize: '24px',
-            fill: '#00FF00',
-            stroke: '#000000',
-            strokeThickness: 2,
-        }).setOrigin(0.5);
-
-        let remainingTime = item.duration;
-        const timerEvent = this.time.addEvent({
-            delay: 1000,
-            callback: () => {
-                remainingTime--;
-                expBoostText.setText(`Boost exp: ${remainingTime}s (+${item.effectValue}% exp gain)`);
-
-                if (remainingTime <= 0) {
-                    expBoostText.destroy();
-                }
-            },
-            repeat: item.duration - 1,
-        });
-
-        this.time.delayedCall(item.duration * 1000, () => {
-            this.character.expBoostActive = false;
-            this.character.expBoost = null;
-            console.log('Boost d\'expérience terminé.');
-        });
-    }
-
-
-
-
 }
-
 export default BossStageScene;

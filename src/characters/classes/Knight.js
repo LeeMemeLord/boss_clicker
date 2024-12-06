@@ -3,17 +3,17 @@ import Character from '../Character.js';
 
 class Knight extends Character {
     constructor(weapon = null) {
-        const defaultWeapon = weapon || new Sword('Rusty Sword', 'common', 1, 10, 'sword');
+        const defaultWeapon = weapon || new Sword('s11', 'common', 1, 10, 'sword');
 
         super(
             'Knight',
             'Un guerrier robuste avec une armure lourde.',
             {
-                hp: 150,
+                hp: 100,
                 atk: 12,
-                def: 18,
+                def: 8,
                 crit: 0.1,
-                lifeSteal: 0.3,
+                lifeSteal: 0.25,
                 skin: 'Knight_1',
             },
             defaultWeapon

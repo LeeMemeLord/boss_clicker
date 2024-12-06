@@ -1,22 +1,4 @@
-const swordPhotos = importAll(require.context('../../assets/swords/32 Free Weapon Icons/Icons', false, /\.(png|jpe?g|svg)$/));
 
-function importAll(r) {
-    const images = {};
-    r.keys().forEach((key) => {
-        const fileName = key.replace('./', ''); // Supprime le préfixe './'
-        images[fileName] = r(key); // Associe le nom du fichier à l'image
-    });
-    return images;
-}
-
-function getRandomSwordPhoto() {
-    const keys = Object.keys(swordPhotos);
-    const randomKey = keys[Math.floor(Math.random() * keys.length)];
-    return {
-        fileName: randomKey.replace(/\.[^/.]+$/, ''), // Retirer l'extension pour un nom plus propre
-        filePath: swordPhotos[randomKey], // Le chemin réel vers l'image
-    };
-}
 
 class Loot {
     constructor(name, rarity, value) {
@@ -46,24 +28,33 @@ export class Sword extends Weapon {
     {
 
         if (levelMultiplier) {
-            const {fileName, filePath} = getRandomSwordPhoto(); // Générer une image aléatoire
+            const name = generateName();
             const generatedRarity = randomRarity();
             const adjustedValue = randomValue(1, levelMultiplier, generatedRarity) + levelMultiplier;
             const adjustedDamage = randomDamage(levelMultiplier, generatedRarity);
 
             super(
-                fileName, // Utiliser le nom du fichier comme nom de l'épée
+                name, // Utiliser le nom du fichier comme nom de l'épée
                 generatedRarity,
                 adjustedValue, // Ajuste la valeur
                 adjustedDamage, // Ajuste les dégâts
                 'sword'
             );
 
-            this.image = filePath; // Associer le chemin de l'image à l'épée
+
         } else {
             super(name, rarity, value, damage, type);
         }
     }
+}
+
+function generateName() {
+    // utiliser s1 a s11
+    const swordNames = ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', 's10'];
+
+    return swordNames[Math.floor(Math.random() * swordNames.length)];
+
+
 }
 
 
@@ -76,20 +67,27 @@ export class Bow extends Weapon {
                 levelMultiplier) // Niveau du personnage
     {
         if (levelMultiplier) {
+            const name = generateBowName();
             const generatedRarity = randomRarity();
-            const adjustedValue = randomValue(100, 500, generatedRarity) * levelMultiplier;
+            const adjustedValue = randomValue(1, levelMultiplier, generatedRarity) + levelMultiplier;
             const adjustedDamage = randomDamage(levelMultiplier, generatedRarity);
+
             super(
-                'Bow',
-                generatedRarity,
-                adjustedValue, // Ajuste la valeur
-                adjustedDamage, // Ajuste les dégâts
-                'bow'
+                name, // Nom généré pour l'arc
+                generatedRarity, // Rareté générée
+                adjustedValue, // Valeur ajustée
+                adjustedDamage, // Dégâts ajustés
+                'bow' // Type d'arme
             );
         } else {
             super(name, rarity, value, damage, type);
         }
     }
+}
+
+function generateBowName() {
+    const bowNames = ['b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'b7', 'b8', 'b9', 'b10'];
+    return bowNames[Math.floor(Math.random() * bowNames.length)];
 }
 
 
@@ -136,7 +134,7 @@ function calculateDuration(rarity) {
 
 function randomRarity() {
     const rarities = ['common', 'rare', 'epic', 'legendary'];
-    const weights = [70, 25, 4, 1];
+    const weights = [80, 15, 4, 1];
 
     const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
     const random = Math.random() * totalWeight;
@@ -180,7 +178,7 @@ function randomDamage(level, rarity) {
 }
 
 export function generateRandomLoot(levelMultiplier = 1) {
-    const lootTypes = [Sword];
+    const lootTypes = [Sword, Bow, Boost, Coin];
 
     const loot = [new Coin()]; // Toujours ajouter un Coin
 
