@@ -821,7 +821,7 @@ class BossStageScene extends Phaser.Scene {
 
     giveExpToCharacter() {
         const currentLevel = this.character.level;
-        const exp = this.boss.expDrop + this.character.expBoost?.effectValue || 0;
+        const exp = this.boss.expDrop
         this.character.gainExp(exp, 'character');
         this.updateExpBar();
         if (currentLevel < this.character.level) {
@@ -885,7 +885,10 @@ class BossStageScene extends Phaser.Scene {
         const textX = 220;
         const textY = 300;
 
-        const timeRemainingText = this.add.text(textX, textY, `Boost atk: ${item.duration}s (+${item.effectValue}% dps gain)`, {
+        const {width, height} = this.sys.game.config;
+
+
+        const timeRemainingText = this.add.text(width / 2, height - 120, `Boost atk: ${item.duration}s (+${item.effectValue}% dps gain)`, {
             fontSize: '24px',
             fill: '#FFD700',
             stroke: '#000000',
@@ -928,10 +931,12 @@ class BossStageScene extends Phaser.Scene {
         const expBoost = this.character.exp * (item.effectValue / 100);
         console.log(`Boost d'expérience appliqué : +${expBoost} (Effect: ${item.effectValue}%)`);
 
+        const {width, height} = this.sys.game.config;
+
         const textX = 220;
         const textY = 330;
 
-        const expBoostText = this.add.text(textX, textY, `Boost exp: ${item.duration}s (+${item.effectValue}% exp gain)`, {
+        const expBoostText = this.add.text(width/ 2, height - 100 , `Boost exp: ${item.duration}s (+${item.effectValue}% exp gain)`, {
             fontSize: '24px',
             fill: '#00FF00',
             stroke: '#000000',
