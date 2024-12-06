@@ -1,70 +1,100 @@
-# Getting Started with Create React App
+# Boss Clicker
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Introduction
+Bienvenue dans **Boss Clicker**, un jeu interactif et addictif où chaque clic compte ! Tous seule, affrontez des boss redoutables, récupérez des butins légendaires, et améliorez votre équipement pour devenir le héros ultime. Ce jeu combine stratégie, action et progression collaborative pour une expérience captivante.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## Concept du jeu
+Dans **Boss Clicker**, vous incarnez un personnage unique équipé d’une arme. Votre objectif principal est de vaincre un boss géant en cliquant pour lui infliger des dégâts. Plus vous attaquez, plus vous affaiblissez le boss. Une fois vaincu, le boss laisse tomber un butin qui peut inclure des objets rares ou des améliorations pour votre équipement.
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Points forts du jeu
+- **Collaboration en temps réel** : Affrontez les boss avec d’autres joueurs pour maximiser les dégâts et partager les récompenses.
+- **Progression continue** : Collectez de l’expérience, améliorez votre arme et débloquez des capacités spéciales.
+- **Boss uniques** : Chaque boss a ses propres caractéristiques, forces et faiblesses.
+- **Loot légendaire** : Obtenez des objets rares pour personnaliser votre personnage et augmenter vos chances de victoire.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## Gameplay
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 1. Création de personnage
+- Choisissez parmi plusieurs classes, comme Chevalier, Mage, ou Rôdeur, chacune ayant des forces et des faiblesses uniques.
+- Personnalisez l’apparence et le nom de votre personnage.
 
-### `npm run build`
+### 2. Combat contre le boss
+- Cliquez sur le boss pour infliger des dégâts.
+- Suivez la barre de vie du boss en temps réel.
+- Activez des boosts d’attaque ou des pouvoirs spéciaux pour infliger des dégâts massifs.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 3. Récompenses
+Une fois le boss vaincu, obtenez des récompenses comme :
+- **Pièces d’or**
+- **Objets d’équipement** : Épées, armures, accessoires, etc.
+- **Bonus d’expérience**
+- **Boosts temporaires** pour les prochaines batailles.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Fonctionnalités
 
-### `npm run eject`
+### Personnage
+- Personnalisation de classe, apparence et arme.
+- Statistiques évolutives : Force, vitesse, résistance.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Équipement
+- Système d’amélioration d’équipement avec des matériaux trouvés en jeu.
+- Collectionnez des épées rares, armures et accessoires.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Boss
+- Chaque boss a une barre de vie et des mécanismes uniques.
+- Difficulté croissante avec chaque victoire.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Mode Multijoueur
+-A Venir
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Animations dynamiques
+- Effets visuels immersifs pour les attaques et les capacités spéciales.
 
-## Learn More
+---
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Comment jouer
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+1. **Lancer le jeu** : Cloner le repo git, npm install et assurez vous que le session storage est vice.
+2. **Créer votre personnage** : Configurez votre héros selon vos préférences.
+4. **Clics stratégiques** : Cliquez pour attaquer et activez vos boosts au bon moment.
+5. **Collecter les récompenses** : Améliorez votre personnage et préparez-vous pour le prochain combat.
 
-### Code Splitting
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Technologies utilisées
+- **Frontend** : React avec animations dynamiques.
+- **Backend** : Node.js avec une base de données MongoDB pour sauvegarder la progression des joueurs.
+- **Graphismes** : Sprites animés pour les personnages et les boss.
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Requis système
+- **Navigateurs** : Dernière version de Chrome, Firefox, Edge.
+- **Ressources** : Minimum 2 Go de RAM pour un jeu fluide.
+- **Connexion internet** : Nécessaire pour le mode multijoueur.
 
-### Making a Progressive Web App
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Crédits
+- **Développeur principal** : Mikhail Kurilenko
+- **Graphisme** : Sprites originaux de la communauté.
+- **Testeurs** : Merci à tous les joueurs ayant participé à la bêta.
 
-### Advanced Configuration
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## À venir
+- Nouveaux boss et armes.
+- Compétitions de leaderboard hebdomadaires.
+- Événements saisonniers avec des récompenses spéciales.
 
-### Deployment
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Prêt à défier les boss ? **Rejoignez l’aventure et devenez une légende !** 🎮🔥
